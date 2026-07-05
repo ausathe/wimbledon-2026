@@ -26,14 +26,11 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: projects/wimbledon-2026/package-lock.json
 
       - name: Install dependencies
-        working-directory: projects/wimbledon-2026
         run: npm ci
 
       - name: Build
-        working-directory: projects/wimbledon-2026
         run: npm run build
 
       - name: Setup Pages
@@ -42,7 +39,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: projects/wimbledon-2026/dist
+          path: dist
 
   deploy:
     needs: build
