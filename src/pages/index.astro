@@ -1,0 +1,62 @@
+---
+import Header from "../components/Header.astro";
+import CourtsControl from "../components/CourtsControl.astro";
+import Footer from "../components/Footer.astro";
+import "../styles/tokens.css";
+import "../styles/global.css";
+import "../styles/bracket.css";
+
+const base = import.meta.env.BASE_URL;
+const siteUrl = Astro.site ?? new URL("https://example.github.io");
+const canonicalUrl = new URL(base, siteUrl).toString();
+const ogImageUrl = new URL(`${base}og-image.png`.replace(/\/{2,}/g, "/"), siteUrl).toString();
+
+const title = "Wimbledon 2026 Bracket (Unofficial Fan Site)";
+const description =
+  "An unofficial, fan-made interactive circular bracket for The Championships, Wimbledon 2026 — Gentlemen's and Ladies' Singles draws, courts, and match status. Illustrative placeholder data.";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+
+    <!-- Open Graph / Twitter (URS-58) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <!-- URS-60: no structured data claiming official status; robots left default (indexable) -->
+    <meta name="robots" content="index,follow" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to bracket</a>
+    <Header />
+    <main id="main-content">
+      <div
+        id="stage-wrap"
+        role="group"
+        aria-label="Wimbledon 2026 knockout bracket, Round of 32 through Final. Interactive: focus or hover a player token or court for match details."
+      >
+        <div id="stage"></div>
+      </div>
+      <CourtsControl />
+      <div class="results-list-wrap">
+        <div id="results-list" tabindex="-1"></div>
+      </div>
+    </main>
+    <Footer />
+    <script src="../bracket/main.ts"></script>
+  </body>
+</html>

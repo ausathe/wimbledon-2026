@@ -1,0 +1,470 @@
+{
+  "id": "ladies-singles",
+  "label": "Ladies' Singles",
+  "bestOf": 3,
+  "rootNum": 31,
+  "children": {
+    "17": [1, 2],
+    "18": [3, 4],
+    "19": [5, 6],
+    "20": [7, 8],
+    "21": [9, 10],
+    "22": [11, 12],
+    "23": [13, 14],
+    "24": [15, 16],
+    "25": [17, 18],
+    "26": [19, 20],
+    "27": [21, 22],
+    "28": [23, 24],
+    "29": [25, 26],
+    "30": [27, 28],
+    "31": [29, 30]
+  },
+  "matches": [
+    {
+      "num": 1,
+      "p1": "l-swiatek",
+      "p2": "l-siegemund",
+      "courtId": "no1",
+      "score": [
+        {
+          "games": [6, 4]
+        },
+        {
+          "games": [7, 6],
+          "tb": [7, 5]
+        }
+      ],
+      "date": "2026-06-30",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 2,
+      "p1": "l-krejcikova",
+      "p2": "l-jabeur",
+      "courtId": "no2",
+      "score": [
+        {
+          "games": [4, 6]
+        },
+        {
+          "games": [6, 7],
+          "tb": [5, 7]
+        }
+      ],
+      "date": "2026-07-01",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 3,
+      "p1": "l-keys",
+      "p2": "l-parry",
+      "courtId": "no3",
+      "score": [
+        {
+          "games": [6, 4]
+        },
+        {
+          "games": [7, 6],
+          "tb": [7, 5]
+        }
+      ],
+      "date": "2026-06-29",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 4,
+      "p1": "l-anisimova",
+      "p2": "l-alexandrova",
+      "courtId": "court12",
+      "score": [
+        {
+          "games": [4, 6]
+        },
+        {
+          "games": [6, 7],
+          "tb": [5, 7]
+        }
+      ],
+      "date": "2026-06-30",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 5,
+      "p1": "l-pegula",
+      "p2": "l-fernandez",
+      "courtId": "court18",
+      "score": [
+        {
+          "games": [6, 4]
+        },
+        {
+          "games": [7, 6],
+          "tb": [7, 5]
+        }
+      ],
+      "date": "2026-07-01",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 6,
+      "p1": "l-samsonova",
+      "p2": "l-navarro",
+      "courtId": "centre",
+      "score": [
+        {
+          "games": [4, 6]
+        },
+        {
+          "games": [6, 7],
+          "tb": [5, 7]
+        }
+      ],
+      "date": "2026-06-29",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 7,
+      "p1": "l-bouzkova",
+      "p2": "l-svitolina",
+      "courtId": "no1",
+      "score": [
+        {
+          "games": [6, 4]
+        },
+        {
+          "games": [7, 6],
+          "tb": [7, 5]
+        }
+      ],
+      "date": "2026-06-30",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 8,
+      "p1": "l-tomljanovic",
+      "p2": "l-paolini",
+      "courtId": "no2",
+      "score": [
+        {
+          "games": [4, 6]
+        },
+        {
+          "games": [6, 7],
+          "tb": [5, 7]
+        }
+      ],
+      "date": "2026-07-01",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 9,
+      "p1": "l-gauff",
+      "p2": "l-cirstea",
+      "courtId": "no3",
+      "score": [
+        {
+          "games": [6, 4]
+        },
+        {
+          "games": [7, 6],
+          "tb": [7, 5]
+        }
+      ],
+      "date": "2026-06-29",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 10,
+      "p1": "l-haddad-maia",
+      "p2": "l-muchova",
+      "courtId": "court12",
+      "score": [
+        {
+          "games": [4, 6]
+        },
+        {
+          "games": [6, 7],
+          "tb": [5, 7]
+        }
+      ],
+      "date": "2026-06-30",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 11,
+      "p1": "l-badosa",
+      "p2": "l-collins",
+      "courtId": "court18",
+      "score": [
+        {
+          "games": [6, 4]
+        },
+        {
+          "games": [7, 6],
+          "tb": [7, 5]
+        }
+      ],
+      "date": "2026-07-01",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 12,
+      "p1": "l-frech",
+      "p2": "l-rybakina",
+      "courtId": "centre",
+      "score": [
+        {
+          "games": [4, 6]
+        },
+        {
+          "games": [6, 7],
+          "tb": [5, 7]
+        }
+      ],
+      "date": "2026-06-29",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 13,
+      "p1": "l-zheng",
+      "p2": "l-kalinskaya",
+      "courtId": "no1",
+      "score": [
+        {
+          "games": [6, 4]
+        },
+        {
+          "games": [7, 6],
+          "tb": [7, 5]
+        }
+      ],
+      "date": "2026-06-30",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 14,
+      "p1": "l-kostyuk",
+      "p2": "l-ostapenko",
+      "courtId": "no2",
+      "score": [
+        {
+          "games": [4, 6]
+        },
+        {
+          "games": [6, 7],
+          "tb": [5, 7]
+        }
+      ],
+      "date": "2026-07-01",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 15,
+      "p1": "l-vondrousova",
+      "p2": "l-linette",
+      "courtId": "no3",
+      "score": [
+        {
+          "games": [6, 4]
+        },
+        {
+          "games": [7, 6],
+          "tb": [7, 5]
+        }
+      ],
+      "date": "2026-06-29",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 16,
+      "p1": "l-mertens",
+      "p2": "l-sabalenka",
+      "courtId": "court12",
+      "score": [
+        {
+          "games": [4, 6]
+        },
+        {
+          "games": [6, 7],
+          "tb": [5, 7]
+        }
+      ],
+      "date": "2026-06-30",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 17,
+      "courtId": "court18",
+      "score": [
+        {
+          "games": [6, 4]
+        },
+        {
+          "games": [7, 6],
+          "tb": [7, 5]
+        }
+      ],
+      "date": "2026-07-04",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 18,
+      "courtId": "centre",
+      "score": [
+        {
+          "games": [4, 6]
+        },
+        {
+          "games": [6, 7],
+          "tb": [5, 7]
+        }
+      ],
+      "date": "2026-07-04",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 19,
+      "courtId": "no1",
+      "score": [
+        {
+          "games": [6, 4]
+        },
+        {
+          "games": [7, 6],
+          "tb": [7, 5]
+        }
+      ],
+      "date": "2026-07-04",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 20,
+      "courtId": "no2",
+      "score": [
+        {
+          "games": [4, 6]
+        },
+        {
+          "games": [6, 7],
+          "tb": [5, 7]
+        }
+      ],
+      "date": "2026-07-04",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 21,
+      "courtId": "no3",
+      "score": [
+        {
+          "games": [6, 4]
+        },
+        {
+          "games": [7, 6],
+          "tb": [7, 5]
+        }
+      ],
+      "date": "2026-07-04",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 22,
+      "courtId": "court12",
+      "score": [
+        {
+          "games": [4, 6]
+        },
+        {
+          "games": [6, 7],
+          "tb": [5, 7]
+        }
+      ],
+      "date": "2026-07-04",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 23,
+      "courtId": "court18",
+      "date": "2026-07-05",
+      "time": "11:00 UTC+1"
+    },
+    {
+      "num": 24,
+      "courtId": "centre",
+      "date": "2026-07-06",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 25,
+      "courtId": "no1",
+      "score": [
+        {
+          "games": [6, 4]
+        },
+        {
+          "games": [7, 6],
+          "tb": [7, 5]
+        }
+      ],
+      "date": "2026-07-06",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 26,
+      "courtId": "no2",
+      "score": [
+        {
+          "games": [4, 6]
+        },
+        {
+          "games": [6, 7],
+          "tb": [5, 7]
+        }
+      ],
+      "date": "2026-07-06",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 27,
+      "courtId": "no3",
+      "date": "2026-07-05",
+      "time": "15:30 UTC+1"
+    },
+    {
+      "num": 28,
+      "courtId": "court12",
+      "date": "2026-07-06",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 29,
+      "courtId": "court18",
+      "score": [
+        {
+          "games": [6, 4]
+        },
+        {
+          "games": [7, 6],
+          "tb": [7, 5]
+        }
+      ],
+      "date": "2026-07-07",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 30,
+      "courtId": "centre",
+      "date": "2026-07-07",
+      "time": "13:00 UTC+1"
+    },
+    {
+      "num": 31,
+      "courtId": "no1",
+      "date": "2026-07-08",
+      "time": "14:00 UTC+1"
+    }
+  ],
+  "placeholder": true,
+  "updatedAt": "2026-07-05T09:00:00Z"
+}

@@ -1,0 +1,299 @@
+/* ============================================================================
+   Global page chrome: header, controls, footer, layout rhythm (URS-33…URS-39).
+============================================================================ */
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+a {
+  color: var(--green);
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: 8px;
+  top: -60px;
+  background: var(--ink);
+  color: var(--bg);
+  padding: 10px 16px;
+  border-radius: 8px;
+  z-index: 100;
+  transition: top 0.15s ease;
+}
+.skip-link:focus {
+  top: 8px;
+}
+
+header.site-header {
+  text-align: center;
+  padding: 22px 16px 6px;
+  max-width: 760px;
+}
+header.site-header h1 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(26px, 4.6vw, 42px);
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: var(--ink);
+}
+header.site-header .sub {
+  margin: 6px 0 0;
+  font-size: clamp(13px, 1.6vw, 15px);
+  color: var(--muted);
+}
+header.site-header .edition {
+  font-weight: 600;
+  color: var(--purple);
+}
+.unofficial-badge {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 11.5px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--purple);
+  background: #efe7f7;
+  border: 1px solid rgba(75, 46, 131, 0.35);
+  border-radius: var(--radius-pill);
+  padding: 4px 12px;
+}
+
+.placeholder-banner {
+  max-width: 720px;
+  margin: 12px 16px 0;
+  padding: 10px 16px;
+  border-radius: var(--radius-card);
+  background: #fff8e6;
+  border: 1px solid rgba(125, 95, 40, 0.35);
+  color: var(--gold);
+  font-size: 13px;
+  text-align: center;
+  line-height: 1.45;
+}
+
+/* Draw toggle (URS-2, URS-37, URS-47) */
+.draw-toggle {
+  display: flex;
+  gap: 8px;
+  margin: 18px 0 2px;
+  border: 1px solid rgba(23, 50, 31, 0.18);
+  border-radius: var(--radius-pill);
+  padding: 4px;
+  background: var(--card);
+}
+.draw-toggle button {
+  font: 600 14px/1 var(--font-sans);
+  color: var(--muted);
+  background: none;
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 9px 20px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+.draw-toggle button:hover {
+  color: var(--ink);
+}
+.draw-toggle button.active {
+  color: #fff;
+  background: var(--green);
+}
+
+main {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+/* Courts control (URS-12…URS-18, URS-37, URS-47) */
+.controls {
+  text-align: center;
+  margin-top: 4px;
+  width: 100%;
+}
+.courts-toggle {
+  font: 600 13px/1 var(--font-sans);
+  color: var(--muted);
+  background: none;
+  border: 1px solid rgba(23, 50, 31, 0.25);
+  border-radius: var(--radius-pill);
+  padding: 8px 18px;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+.courts-toggle:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+.courts-toggle.on {
+  color: var(--ink);
+  border-color: var(--gold-bright);
+  box-shadow: 0 0 0 1px var(--gold-bright);
+}
+
+.courts-legend {
+  display: none;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  width: min(94vw, 920px);
+  margin: 14px auto 4px;
+  padding: 0;
+  list-style: none;
+}
+.courts-legend.on {
+  display: flex;
+}
+.court-pill {
+  font: 600 12.5px/1 var(--font-sans);
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid rgba(23, 50, 31, 0.2);
+  border-radius: var(--radius-pill);
+  padding: 6px 14px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.court-pill.roofed {
+  background: #f2edf8;
+  border-color: rgba(75, 46, 131, 0.35);
+}
+.court-pill.open {
+  background: #eef4ef;
+  border-color: rgba(0, 103, 71, 0.3);
+}
+.court-pill:hover {
+  border-color: var(--gold-bright);
+}
+.court-pill.sel {
+  border-color: var(--gold-bright);
+  box-shadow: 0 0 0 1px var(--gold-bright);
+}
+.court-pill .n {
+  color: var(--muted);
+  margin-left: 8px;
+  font-size: 11px;
+}
+
+.results-list-wrap {
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+}
+/* Shown to sighted keyboard users who focus into it too, not just SR-only —
+   satisfies URS-48 without duplicating the whole bracket visually. When a
+   descendant gets focus, temporarily reveal so keyboard users can see where
+   they are; otherwise keep it visually hidden. */
+.results-list-wrap:focus-within {
+  position: static;
+  width: auto;
+  height: auto;
+  max-width: 720px;
+  margin: 16px auto;
+  padding: 16px 20px;
+  background: var(--card);
+  border-radius: var(--radius-card);
+  border: 1px solid rgba(23, 50, 31, 0.15);
+}
+.results-list-wrap h2 {
+  font-family: var(--font-serif);
+}
+.results-list-wrap ul {
+  padding-left: 20px;
+}
+
+footer.site-footer {
+  color: var(--muted);
+  font-size: 12.5px;
+  text-align: center;
+  padding: 22px 16px 30px;
+  line-height: 1.6;
+  max-width: 640px;
+}
+footer.site-footer .disclaimer {
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+footer.site-footer .facts {
+  margin-bottom: 8px;
+}
+.status-line {
+  margin-top: 10px;
+}
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold-bright);
+  vertical-align: middle;
+  margin-right: 6px;
+}
+.status-dot.ok {
+  background: #3f8a52;
+}
+.status-dot.err {
+  background: #b3432f;
+}
+
+/* Responsive breakpoints (URS-41) */
+@media (min-width: 720px) {
+  header.site-header {
+    padding: 14px 12px 4px;
+  }
+}
+@media (max-width: 480px) {
+  header.site-header h1 {
+    font-size: 24px;
+  }
+  .draw-toggle button {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+  .tooltip {
+    font-size: 12px;
+  }
+}

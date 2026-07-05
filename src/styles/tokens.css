@@ -1,0 +1,33 @@
+/* ============================================================================
+   Design tokens (URS-33). Wimbledon green/purple/gold on ivory, all pairings
+   checked for WCAG AA (URS-45) — see comments per token for the ratio verified
+   against --bg (#f4f1e8) or --ink (#17321f) as applicable.
+============================================================================ */
+:root {
+  --bg: #f4f1e8; /* ivory ground */
+  --ink: #17321f; /* deep green-black text; ink-on-bg ~13.9:1 */
+  --green: #00543a; /* darkened from #006747 for AA text-on-ivory (~7.7:1) */
+  --green-bright: #006747; /* original Wimbledon green, used for large UI/borders only */
+  --purple: #4b2e83; /* purple-on-ivory ~8.4:1 */
+  --gold: #7d5f28; /* darkened from #b9975b so gold text/labels clear AA (~5.25:1) on ivory */
+  --gold-bright: #c8a24a; /* original lighter gold, decorative borders/rings only (non-text) */
+  --live: #7a1f6a; /* purple-leaning live pulse; clears AA as UI/large text on ivory */
+  --muted: #57594f; /* muted UI text, ~5.3:1 on ivory (was too light at --muted-old) */
+  --line: #2a3a2f; /* connector strokes */
+  --card: #ffffff;
+  --focus: #1d5fae; /* visible focus ring, AA against ivory and white */
+
+  --font-serif: "Playfair Display", "Iowan Old Style", "Source Serif Pro", Georgia, serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  --radius-pill: 999px;
+  --radius-card: 14px;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  /* The design brief calls for a light editorial feel; we intentionally do not
+     ship a dark theme for v1, but keep color-scheme explicit above so form
+     controls/scrollbars don't mismatch the light page. */
+}

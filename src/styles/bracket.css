@@ -1,0 +1,417 @@
+/* ============================================================================
+   Bracket stage styling. Ported from the reference's stage/.flag/.tooltip/.cap
+   rules, retinted to Wimbledon green/purple/gold-on-ivory (URS-33) and adapted
+   for tennis: seed/code badges (URS-21, URS-22), status classes renamed
+   live/deck/soon (URS-25), court-tier tint replacing host-nation tint (URS-18).
+============================================================================ */
+
+/* Square, responsive stage (URS-36). The vw/vh width is a no-JS fallback;
+   fitStage() in main.ts overrides it with an absolute px width so browser
+   zoom scales the bracket like normal content instead of pinning it to the
+   viewport. */
+#stage-wrap {
+  position: relative;
+  width: min(94vw, 78vh, 920px);
+  aspect-ratio: 1 / 1;
+  margin: 10px auto 6px;
+}
+
+#stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+#stage svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.conn {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 2.4;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+.dot {
+  fill: var(--line);
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+.center-line {
+  stroke: var(--line);
+  stroke-width: 2.4;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+.trophy {
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+/* Court capsule: a thick round-capped arc behind a match's two participants.
+   Always present as the tooltip hitbox (pointer-events:stroke), hidden until
+   "Show courts" is on (URS-14). */
+.cap {
+  fill: none;
+  stroke: var(--gold-bright);
+  stroke-linecap: round;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+.cap.roofed {
+  stroke: var(--purple);
+}
+.cap.open {
+  stroke: var(--green-bright);
+}
+#stage-wrap.courts-on .cap {
+  opacity: 0.28;
+}
+#stage-wrap.cfilter .cap {
+  opacity: 0.08;
+}
+#stage-wrap.cfilter .cap.chit {
+  opacity: 0.46;
+}
+#stage-wrap.cfilter .flag-wrap:not(.chit) {
+  opacity: 0.2;
+}
+#stage-wrap.cfilter .conn:not(.chit),
+#stage-wrap.cfilter .dot:not(.chit),
+#stage-wrap.cfilter .center-line:not(.chit),
+#stage-wrap.cfilter .trophy:not(.chit) {
+  opacity: 0.12;
+}
+
+/* Player tokens: HTML wrapper (positioned) containing the flag <img>, a seed
+   badge, and a short-code badge (URS-21, URS-22) — flags alone are ambiguous
+   since two players can share a nation, unlike national teams. */
+/* .flag-wrap is sized in % of #stage-wrap (its positioned ancestor) so the
+   token has an explicit box; .flag-img/.flag-fallback::before then simply
+   fill 100% of that box. (Percent sizing on the <img> itself with an
+   auto-sized wrapper was a circular-sizing bug: the wrapper had no intrinsic
+   size to resolve the percentage against, so both collapsed to ~9px.) */
+.flag-wrap {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition:
+    opacity 0.2s ease,
+    width 0.25s ease,
+    height 0.25s ease;
+}
+.flag-wrap:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 50%;
+}
+.flag-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  border: 2px solid #fff;
+  aspect-ratio: 1 / 1;
+}
+.flag-fallback {
+  border-radius: 50%;
+}
+.flag-fallback .flag-img {
+  display: none;
+}
+.flag-fallback::before {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #cfc9bd;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Ring-level sizing (outer = largest, shrinking inward, champion = largest of
+   all). Percentages are of #stage-wrap; kept at/under the reference's own
+   6.6%/5.7%/5.2%/5.0% so adjacent outer tokens (8.4% chord apart at radius
+   430) never touch/overlap. */
+.flag-wrap.r0 {
+  width: 6.2%;
+  height: 6.2%;
+}
+.flag-wrap.r1 {
+  width: 5.4%;
+  height: 5.4%;
+}
+.flag-wrap.r2 {
+  width: 4.9%;
+  height: 4.9%;
+}
+.flag-wrap.r3 {
+  width: 4.7%;
+  height: 4.7%;
+}
+.flag-wrap.r4 {
+  width: 4.7%;
+  height: 4.7%;
+}
+.flag-wrap.champ {
+  width: 8.6%;
+  height: 8.6%;
+}
+.flag-wrap.champ .flag-img,
+.flag-wrap.champ.flag-fallback::before {
+  border-color: var(--gold-bright);
+  box-shadow:
+    0 0 0 3px var(--gold-bright),
+    0 2px 8px rgba(0, 0, 0, 0.35);
+}
+.flag-wrap.eliminated .flag-img {
+  filter: grayscale(0.75) opacity(0.75);
+}
+/* URS-51: winner/eliminated is never colour-only — the ring/border shape change
+   plus the seed/code badge + tooltip text also carry the meaning. */
+.flag-wrap.win .flag-img {
+  border-color: var(--gold-bright);
+  box-shadow: 0 0 0 3px var(--gold-bright);
+}
+
+.flag-wrap.pop {
+  animation: pop 0.55s cubic-bezier(0.2, 1.5, 0.4, 1);
+}
+@keyframes pop {
+  0% {
+    transform: translate(-50%, -50%) scale(0.1);
+    opacity: 0;
+  }
+  60% {
+    transform: translate(-50%, -50%) scale(1.18);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Status cues (URS-25): soft ring = today, pulsing = imminent/live. Colour is
+   paired with animation + tooltip text, never colour-only (URS-51). */
+.flag-wrap.soon .flag-img {
+  border-color: var(--gold-bright);
+  box-shadow:
+    0 0 0 2px var(--gold-bright),
+    0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.flag-wrap.deck .flag-img {
+  border-color: var(--gold-bright);
+  animation: deckPulse 4s ease-in-out infinite;
+}
+.flag-wrap.live .flag-img {
+  border-color: var(--purple);
+  animation: livePulse 4s ease-in-out infinite;
+}
+@keyframes deckPulse {
+  0%,
+  30%,
+  100% {
+    box-shadow:
+      0 0 0 2px var(--gold-bright),
+      0 0 5px 1px rgba(200, 162, 74, 0.3),
+      0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+  15% {
+    box-shadow:
+      0 0 0 3px var(--gold-bright),
+      0 0 12px 4px rgba(200, 162, 74, 0.55),
+      0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+}
+@keyframes livePulse {
+  0%,
+  30%,
+  100% {
+    box-shadow:
+      0 0 0 2px var(--purple),
+      0 0 5px 1px rgba(75, 46, 131, 0.3),
+      0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+  15% {
+    box-shadow:
+      0 0 0 3px var(--purple),
+      0 0 12px 4px rgba(75, 46, 131, 0.55),
+      0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* Seed + short-code badges (URS-21, URS-22): small pill labels anchored to the
+   token so a shared nationality never leaves two players indistinguishable. */
+.seed-badge {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  border-radius: 999px;
+  background: var(--purple);
+  color: #fff;
+  font: 700 10px/16px var(--font-sans);
+  text-align: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  pointer-events: none; /* decorative (aria-hidden); never steal the token's tap/click target */
+}
+.code-badge {
+  position: absolute;
+  bottom: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  pointer-events: none;
+  font: 700 9px/14px var(--font-sans);
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+.flag-wrap.champ .code-badge {
+  background: var(--gold-bright);
+  color: var(--ink);
+}
+
+/* Custom tooltip (URS-23, URS-24, URS-43, URS-44). Document-coordinate
+   positioning (see tooltip.ts); --tts counter-scales under pinch zoom. */
+.tooltip {
+  position: absolute;
+  z-index: 50;
+  pointer-events: none;
+  --tts: 1;
+  transform-origin: 0 0;
+  background: var(--ink);
+  color: var(--bg);
+  padding: 8px 14px;
+  border-radius: 10px;
+  font: 13px/1.4 var(--font-sans);
+  text-align: center;
+  white-space: nowrap;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transform: scale(var(--tts)) translate(-50%, -100%) translateY(-6px) scale(0.96);
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease;
+}
+.tooltip.on {
+  opacity: 1;
+  transform: scale(var(--tts)) translate(-50%, -100%) translateY(-10px) scale(1);
+}
+.tooltip::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  transform: translateX(-50%) rotate(45deg);
+  width: 10px;
+  height: 10px;
+  background: var(--ink);
+  border-radius: 2px;
+}
+.tooltip.below {
+  transform: scale(var(--tts)) translate(-50%, 0) translateY(6px) scale(0.96);
+}
+.tooltip.below.on {
+  transform: scale(var(--tts)) translate(-50%, 0) translateY(10px) scale(1);
+}
+.tooltip.below::after {
+  top: -5px;
+  bottom: auto;
+}
+.tooltip .tt-round {
+  font-size: 10px;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--gold-bright);
+}
+.tooltip .tt-teams {
+  font-weight: 600;
+  margin-top: 2px;
+  white-space: normal;
+  max-width: 46ch;
+}
+.tooltip .tt-score {
+  margin-top: 4px;
+  font-size: 15px;
+  font-weight: 800;
+  white-space: normal;
+}
+.tooltip .tt-score.pending {
+  font-size: 12px;
+  font-weight: 500;
+  color: #cfc9bd;
+}
+.tooltip .tt-score.live {
+  color: #ffb0e0;
+}
+.tooltip .tt-score.live .live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff7ad1;
+  margin-right: 6px;
+  vertical-align: middle;
+  animation: livePulse 1.7s ease-in-out infinite;
+}
+.tooltip .tt-soon {
+  margin-top: 3px;
+  font-size: 10px;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--gold-bright);
+}
+.tooltip .tt-court {
+  margin-top: 5px;
+  font-size: 11px;
+  color: #cfc9bd;
+}
+.tooltip .tt-placeholder {
+  margin-top: 4px;
+  font-size: 10px;
+  font-style: italic;
+  color: #a99;
+}
+
+/* Reduced motion (URS-38, URS-50): kill non-essential animation entirely. */
+@media (prefers-reduced-motion: reduce) {
+  .flag-wrap.pop {
+    animation: none;
+  }
+  .flag-wrap.deck .flag-img,
+  .flag-wrap.live .flag-img,
+  .tooltip .tt-score.live .live-dot {
+    animation: none;
+  }
+  .flag-img,
+  .conn,
+  .dot,
+  .center-line,
+  .trophy,
+  .cap,
+  .tooltip,
+  .flag-wrap {
+    transition: none !important;
+  }
+}
