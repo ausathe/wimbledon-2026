@@ -7,7 +7,10 @@ affiliated with the AELTC / Wimbledon / ATP / WTA / ITF.**
 
 ## Specs (source of truth)
 - `docs/URS.md` — numbered requirements (`URS-n`). The contract; test-agent verifies against it.
-- `docs/BUILD-BLUEPRINT.md` — stack rationale, folder map, data model, build order, conventions.
+  Base bracket = URS-1…URS-77; **live-scores feature = URS-78…URS-106 (addendum A)**.
+- `docs/BUILD-BLUEPRINT.md` — base bracket: stack rationale, folder map, data model, build order.
+- `docs/LIVE-SCORES-BLUEPRINT.md` — live-scores feature: ESPN feed adapter, overlay/reconcile
+  design, scoreboard UI, poll/tick timing, degradation matrix, module list (`src/live/**`).
 Reference everything by `URS-n` id. If a requirement looks wrong, escalate to design-agent —
 don't reinterpret it silently.
 

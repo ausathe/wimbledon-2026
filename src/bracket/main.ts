@@ -8,6 +8,9 @@ import { buildModel } from "./model";
 import { renderBracket, renderResultsList } from "./render";
 import { Tooltip, type TipData } from "./tooltip";
 import { CourtsController } from "./courts";
+import { LiveStore } from "../live/live-store";
+import { renderScoreboard, updateAgoStampAndPulse, type ScoreboardMount } from "../live/scoreboard";
+import type { LiveOverlay } from "../live/types";
 
 import gentlemensRaw from "../data/gentlemens-singles.json";
 import ladiesRaw from "../data/ladies-singles.json";
@@ -50,6 +53,15 @@ const prevWinnersByDraw: Record<DrawId, Record<number, string | null>> = {
   "ladies-singles": {},
 };
 
+/* Live overlay state (URS-88): empty until/unless the live feed resolves a
+ * match onto a node. Bracket render() reads this every call; removing the
+ * live layer entirely (overlays always {}) reproduces the pre-feature render
+ * exactly (URS-85, URS-98). */
+let overlaysByDraw: Record<DrawId, LiveOverlay> = {
+  "gentlemens-singles": {},
+  "ladies-singles": {},
+};
+
 const tooltip = new Tooltip();
 
 const courtsController =
@@ -88,15 +100,17 @@ function render(): void {
   if (!stage || !resultsListEl) return;
   const draw = DRAWS[currentDrawId];
   const model = buildModel(draw);
+  const overlay = overlaysByDraw[currentDrawId];
   const { html, winners } = renderBracket({
     draw,
     model,
     prevWinners: prevWinnersByDraw[currentDrawId],
     nowMs: Date.now(),
+    overlay,
   });
   stage.innerHTML = html;
   prevWinnersByDraw[currentDrawId] = winners;
-  resultsListEl.innerHTML = renderResultsList(draw, model);
+  resultsListEl.innerHTML = renderResultsList(draw, model, overlay);
   courtsController?.buildLegend(model);
   courtsController?.applyHighlight();
   wireStageInteractions();
@@ -128,6 +142,9 @@ function tipFromDataset(el: HTMLElement): TipData | null {
     status: d.status ?? "",
     court: d.court ?? "",
     placeholder: d.placeholder === "1",
+    live: d.live === "1",
+    liveDetail: d.liveDetail || undefined,
+    serving: d.serving || undefined,
   };
 }
 
@@ -232,6 +249,11 @@ function fmtStamp(d: Date): string {
     : d.toLocaleString(undefined, { month: "short", day: "numeric", ...opts });
 }
 
+/** liveStatusText: distinguishes the LIVE FEED's own state (URS-101) from the
+ * local dataset's `updatedAt` stamp (URS-30) -- the two are never conflated:
+ * this text is appended after the existing "data updated ..." segment. */
+let liveStatusText = "";
+
 function setStatus(ok: boolean, msg?: string): void {
   if (!dotEl || !statusEl) return;
   dotEl.className = `status-dot ${ok ? "ok" : "err"}`;
@@ -242,6 +264,7 @@ function setStatus(ok: boolean, msg?: string): void {
     const d = new Date(updatedAt);
     if (!Number.isNaN(d.getTime())) parts.push(`data updated ${fmtStamp(d)}`);
   }
+  if (liveStatusText) parts.push(liveStatusText);
   statusEl.textContent = parts.join(" · ");
 }
 
@@ -257,3 +280,57 @@ function load(): void {
 }
 
 load();
+
+/* ============================================================================
+   Live scores feature wiring (URS-78…URS-106, LIVE-SCORES-BLUEPRINT §5).
+   Everything below is additive: if the live feed never succeeds, overlays
+   stay {} and the bracket/status line read exactly as the pre-feature build
+   (URS-98). This block is the ONLY place main.ts touches src/live/**.
+============================================================================ */
+const liveDetailsEl = document.getElementById("live-details");
+const liveCardsEl = document.getElementById("live-cards");
+const liveRegionEl = document.getElementById("live-region");
+const liveAgoEl = document.getElementById("live-ago");
+const liveBadgeEl = document.getElementById("live-badge");
+
+const scoreboardMount: ScoreboardMount | null =
+  liveDetailsEl && liveCardsEl && liveRegionEl && liveAgoEl && liveBadgeEl
+    ? {
+        root: liveDetailsEl,
+        cardsEl: liveCardsEl,
+        liveRegionEl,
+        agoEl: liveAgoEl,
+        badgeEl: liveBadgeEl,
+      }
+    : null;
+
+if (!scoreboardMount) {
+  console.warn("live: scoreboard DOM mount points missing -- live panel disabled, bracket unaffected");
+}
+
+const liveStore = new LiveStore({
+  getDraw: (id) => DRAWS[id],
+  getModel: (id) => buildModel(DRAWS[id]),
+});
+
+liveStore.subscribe((state, event) => {
+  if (event === "poll") {
+    overlaysByDraw = state.overlays;
+    render(); // re-render the bracket WITH the overlay for currentDrawId (URS-88)
+    if (scoreboardMount) renderScoreboard(state, scoreboardMount);
+    liveStatusText = state.ok
+      ? state.liveCount > 0
+        ? `Live · updated just now`
+        : state.isWimbledon
+          ? "Live feed connected — no matches live right now"
+          : "Live feed connected — no current Wimbledon event"
+      : "Live feed unavailable — showing saved snapshot";
+    setStatus(true);
+  } else {
+    // tick: no network, no bracket rebuild (URS-95) -- only the "updated Xs
+    // ago" stamp + LIVE pulse refresh.
+    if (scoreboardMount) updateAgoStampAndPulse(state, scoreboardMount);
+  }
+});
+
+liveStore.start();

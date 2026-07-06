@@ -12,6 +12,12 @@ export interface TipData {
   status: string;
   court: string;
   placeholder: boolean;
+  /** True when this match currently has live-feed coverage (URS-93). */
+  live?: boolean;
+  /** status.type.detail from the feed, e.g. "5th Set" (URS-93). */
+  liveDetail?: string;
+  /** Resolved server name, if the feed provided possession (URS-90, URS-93). */
+  serving?: string;
 }
 
 function escapeHTML(s: string): string {
@@ -35,11 +41,24 @@ export class Tooltip {
   show(anchorEl: HTMLElement, ev: { pageX: number; pageY: number }, tip: TipData): void {
     let scoreHTML: string;
     if (tip.score) {
-      scoreHTML = `<div class="tt-score">${escapeHTML(tip.score)}</div>`;
+      const liveTag =
+        tip.status === "live"
+          ? `<div class="tt-live-tag"><span class="live-dot" aria-hidden="true"></span>Live${
+              tip.liveDetail ? ` · ${escapeHTML(tip.liveDetail)}` : ""
+            }</div>`
+          : "";
+      const servingTag =
+        tip.live && tip.serving
+          ? `<div class="tt-serving"><span class="serve-dot" aria-hidden="true"></span>${escapeHTML(
+              tip.serving,
+            )} serving</div>`
+          : "";
+      scoreHTML = liveTag + `<div class="tt-score">${escapeHTML(tip.score)}</div>` + servingTag;
     } else if (tip.status === "live") {
       scoreHTML =
-        `<div class="tt-score live"><span class="live-dot" aria-hidden="true"></span>Live</div>` +
-        (tip.when ? `<div class="tt-soon">Started · ${escapeHTML(tip.when)}</div>` : "");
+        `<div class="tt-score live"><span class="live-dot" aria-hidden="true"></span>Live${
+          tip.liveDetail ? ` · ${escapeHTML(tip.liveDetail)}` : ""
+        }</div>` + (tip.when ? `<div class="tt-soon">Started · ${escapeHTML(tip.when)}</div>` : "");
     } else {
       const ahead = tip.status === "deck" ? "On court next" : tip.status === "soon" ? "Today" : "";
       scoreHTML =
@@ -51,7 +70,11 @@ export class Tooltip {
       `<div class="tt-teams">${escapeHTML(tip.teams)}</div>` +
       scoreHTML +
       (tip.court ? `<div class="tt-court">${escapeHTML(tip.court)}</div>` : "") +
-      (tip.placeholder ? `<div class="tt-placeholder">Illustrative placeholder</div>` : "");
+      (tip.live
+        ? `<div class="tt-live-credit">Live via ESPN (unofficial)</div>`
+        : tip.placeholder
+          ? `<div class="tt-placeholder">Illustrative placeholder</div>`
+          : "");
     this.position(anchorEl, ev);
     this.el.classList.add("on");
   }

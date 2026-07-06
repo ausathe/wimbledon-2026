@@ -1,0 +1,41 @@
+---
+/* Static shell for the "Live now" panel (URS-90…URS-92, URS-103, URS-105).
+   Collapsible via <details>/<summary> so it never crowds the bracket stage
+   on mobile (URS-92) and is keyboard-operable natively. All dynamic content
+   is filled in by src/live/scoreboard.ts at runtime -- this file carries no
+   business logic (matches the project's static-chrome convention).
+
+   Starts CLOSED (no `open` attribute): the panel's content height swings
+   from a one-line placeholder to potentially many scorecards once the first
+   live poll resolves -- if the panel were open by default, that swing pushes
+   the bracket stage down after paint, a real cumulative-layout-shift (CLS)
+   regression measured against the URS-104/Lighthouse quality bar. Closed by
+   default keeps the summary bar's height stable regardless of poll results;
+   the "LIVE" badge + "updated Xs ago" stamp in the summary itself signal
+   there's something to expand, and expanding is a user-initiated action
+   (excluded from CLS as "recent input"). The bracket remains the primary
+   element either way (URS-92). */
+---
+
+<section id="live-scoreboard" aria-label="Live scores" class="live-scoreboard">
+  <details id="live-details">
+    <summary class="live-summary">
+      <span class="live-title">Live now</span>
+      <span id="live-badge" class="ls-badge-header">OFFLINE</span>
+      <span id="live-ago" class="live-ago">Connecting…</span>
+    </summary>
+
+    <div id="live-cards" class="live-cards" aria-busy="false">
+      <p class="ls-empty">Connecting to the live feed…</p>
+    </div>
+
+    <p id="live-region" class="sr-only" aria-live="polite" aria-atomic="false"></p>
+
+    <p class="live-credit">
+      Live set &amp; game scores via <a href="https://www.espn.com/tennis/" target="_blank" rel="noopener"
+        >ESPN's public feed</a
+      > — unofficial, may lag or differ from official Wimbledon scoring. No point-by-point (0/15/30/40) data
+      is available or shown.
+    </p>
+  </details>
+</section>

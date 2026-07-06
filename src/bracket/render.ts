@@ -5,7 +5,7 @@
    circular clipping is trivial. Diffs the previous winner set to decide which
    tokens get the "pop" reveal animation (URS-27).
 ============================================================================ */
-import type { Draw, ResolvedModel } from "./types";
+import type { Draw, ResolvedModel, ResolvedNode } from "./types";
 import { buildGeometry } from "./layout";
 import { formatScore } from "./model";
 import { roundName, sideLabel } from "./labels";
@@ -14,6 +14,52 @@ import { formatScheduled } from "./time";
 import { playerById } from "../data/players";
 import { courtName, courtTierClass } from "../data/courts";
 import type { TipData } from "./tooltip";
+import type { LiveNodeData, LiveOverlay } from "../live/types";
+
+/* ============================================================================
+   Live overlay merge hook (URS-88, URS-89, URS-93) -- the ONLY place
+   src/bracket/** reads live data. `effectiveNode` produces a node-shaped view
+   with live score/winner/court substituted when the feed covers this node;
+   otherwise it returns the local node completely unchanged. Removing the
+   `overlay` argument (or passing `undefined`/`{}`) makes every call a no-op,
+   which is what restores the exact pre-feature render (URS-85).
+============================================================================ */
+export interface EffectiveNode extends ResolvedNode {
+  /** True when this node's data currently comes from the live feed and the
+   * feed reports the match in progress (URS-89) -- forces the "live" status
+   * cue regardless of the clock heuristic. */
+  liveInProgress: boolean;
+  /** True when ANY live data (in or post) is overlaid on this node -- used to
+   * enrich the tooltip (URS-93) even for a live "post" result. */
+  hasLiveCoverage: boolean;
+  /** status.type.detail from the feed, e.g. "5th Set" (URS-90, URS-93). */
+  liveDetail?: string;
+  /** Resolved player id of the server, if the feed provided possession. */
+  servingPlayerId?: string;
+}
+
+function effectiveNode(node: ResolvedNode | undefined, live: LiveNodeData | undefined): EffectiveNode | undefined {
+  if (!node) return undefined;
+  if (!live || (live.state !== "in" && live.state !== "post")) {
+    return { ...node, liveInProgress: false, hasLiveCoverage: false };
+  }
+  const liveInProgress = live.state === "in";
+  // Precedence (URS-88): live "in"/"post" data drives score+winner; if the
+  // live grid is empty (e.g. pre-serve), keep the local score rather than
+  // blanking a previously-known result.
+  const score = live.sets.length > 0 ? live.sets : node.score;
+  const winner = live.state === "post" && live.winnerPlayerId ? live.winnerPlayerId : node.winner;
+  return {
+    ...node,
+    score,
+    winner,
+    courtId: live.court ?? node.courtId,
+    liveInProgress,
+    hasLiveCoverage: true,
+    liveDetail: live.detail,
+    servingPlayerId: live.servingPlayerId,
+  };
+}
 
 function escapeAttr(s: string): string {
   return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
@@ -29,12 +75,15 @@ interface FlagRenderInfo {
 }
 
 /** Everything render() needs from the outside world, injected so this module
- * stays pure/testable and framework-free (BUILD-BLUEPRINT §12). */
+ * stays pure/testable and framework-free (BUILD-BLUEPRINT §12). `overlay` is
+ * optional and defaults to empty -- omitting it entirely reproduces the exact
+ * pre-feature render (URS-85, URS-88). */
 export interface RenderContext {
   draw: Draw;
   model: ResolvedModel;
   prevWinners: Record<number, string | null>;
   nowMs: number;
+  overlay?: LiveOverlay;
 }
 
 export interface RenderResult {
@@ -47,13 +96,17 @@ function tipFor(
   model: ResolvedModel,
   num: number,
   maxLevel: number,
+  overlay: LiveOverlay | undefined,
   overrideRound?: string,
 ): TipData {
-  const node = model[num];
+  const node = effectiveNode(model[num], overlay?.[num]);
   const level = buildGeometry(draw).levelOf[num]!;
   const teams = `${sideLabel(draw, model, num, 0)} vs ${sideLabel(draw, model, num, 1)}`;
   const score = formatScore(node?.score);
-  const status = matchStatus(node, Date.now());
+  // Live-forcing (URS-89): a node with live "in" coverage always reads as
+  // live regardless of the clock heuristic; otherwise fall back to it as-is.
+  const status = node?.liveInProgress ? "live" : matchStatus(node, Date.now());
+  const servingPlayer = node?.servingPlayerId ? playerById(node.servingPlayerId) : undefined;
   return {
     round: overrideRound ?? roundName(level, maxLevel),
     teams,
@@ -62,6 +115,9 @@ function tipFor(
     status,
     court: courtName(node?.courtId),
     placeholder: draw.placeholder,
+    live: !!node?.hasLiveCoverage,
+    liveDetail: node?.liveDetail,
+    serving: servingPlayer?.name,
   };
 }
 
@@ -71,6 +127,8 @@ function tipAttrs(tip: TipData, courtId?: string): string {
     `data-score="${escapeAttr(tip.score)}" data-when="${escapeAttr(tip.when)}" ` +
     `data-status="${escapeAttr(tip.status)}" data-court="${escapeAttr(tip.court)}" ` +
     `data-placeholder="${tip.placeholder ? "1" : ""}" ` +
+    `data-live="${tip.live ? "1" : ""}" data-live-detail="${escapeAttr(tip.liveDetail ?? "")}" ` +
+    `data-serving="${escapeAttr(tip.serving ?? "")}" ` +
     `data-court-id="${escapeAttr(courtId ?? "")}"`
   );
 }
@@ -98,7 +156,7 @@ function flagURL(iso: string | undefined, bucket: string): string {
  * report which nodes newly resolved a winner (for the pop animation + the
  * caller's prevWinners bookkeeping) (URS-27). */
 export function renderBracket(ctx: RenderContext): RenderResult {
-  const { draw, model, prevWinners } = ctx;
+  const { draw, model, prevWinners, overlay } = ctx;
   const geo = buildGeometry(draw);
   const maxLevel = geo.maxLevel;
   const newWinners: Record<number, string | null> = {};
@@ -106,14 +164,14 @@ export function renderBracket(ctx: RenderContext): RenderResult {
 
   // Outer ring: the two players of every leaf match (URS-4).
   for (const f of geo.flagOrder) {
-    const node = model[f.num];
+    const node = effectiveNode(model[f.num], overlay?.[f.num]);
     const playerId = node?.participants[f.slot];
     if (!playerId) continue; // URS-7: undecided outer slot renders as a dot elsewhere? -- leaves always have both known in our data, but guard anyway
     const [x, y] = geo.pt(geo.radius[0]!, geo.flagAngle(geo.flagOrder.indexOf(f)));
     const win = node?.winner;
     const eliminated = !!win && win !== playerId;
-    const tip = tipFor(draw, model, f.num, maxLevel);
-    const status = matchStatus(node, ctx.nowMs);
+    const tip = tipFor(draw, model, f.num, maxLevel, overlay);
+    const status = node?.liveInProgress ? "live" : matchStatus(node, ctx.nowMs);
     const statusCls = status ? ` ${status}` : "";
     flags.push({
       x,
@@ -136,9 +194,9 @@ export function renderBracket(ctx: RenderContext): RenderResult {
   const allNums = Object.keys(geo.levelOf).map(Number);
   for (const num of allNums) {
     const lvl = geo.levelOf[num]!;
-    const node = model[num];
+    const node = effectiveNode(model[num], overlay?.[num]);
     const courtIdAttr = `data-court-id="${escapeAttr(node?.courtId ?? "")}"`;
-    const capTip = tipFor(draw, model, num, maxLevel);
+    const capTip = tipFor(draw, model, num, maxLevel, overlay);
     caps += `<path class="cap${courtTierClass(node?.courtId)}" ${tipAttrs(capTip, node?.courtId)} stroke-width="${geo.capsuleStrokeWidth(num)}" d="${geo.capsulePath(num)}"/>`;
     if (lvl <= maxLevel - 1) {
       conns += `<path class="conn" ${courtIdAttr} d="${geo.connectorPath(num)}"/>`;
@@ -153,10 +211,11 @@ export function renderBracket(ctx: RenderContext): RenderResult {
       const nextNum = parentOf[num];
       const tip =
         nextNum != null
-          ? tipFor(draw, model, nextNum, maxLevel)
-          : tipFor(draw, model, num, maxLevel);
-      const advanced = nextNum != null && model[nextNum]?.winner === w ? " win" : "";
-      const status = matchStatus(nextNum != null ? model[nextNum] : undefined, ctx.nowMs);
+          ? tipFor(draw, model, nextNum, maxLevel, overlay)
+          : tipFor(draw, model, num, maxLevel, overlay);
+      const nextEffective = nextNum != null ? effectiveNode(model[nextNum], overlay?.[nextNum]) : undefined;
+      const advanced = nextNum != null && nextEffective?.winner === w ? " win" : "";
+      const status = nextEffective?.liveInProgress ? "live" : matchStatus(nextEffective, ctx.nowMs);
       const statusCls = status ? ` ${status}` : "";
       flags.push({
         x,
@@ -172,7 +231,7 @@ export function renderBracket(ctx: RenderContext): RenderResult {
   }
 
   // Final / centre (URS-5).
-  const finalNode = model[draw.rootNum];
+  const finalNode = effectiveNode(model[draw.rootNum], overlay?.[draw.rootNum]);
   const finalCourtAttr = `data-court-id="${escapeAttr(finalNode?.courtId ?? "")}"`;
   const [sfA, sfB] = draw.children[draw.rootNum] ?? [];
   let center = "";
@@ -186,7 +245,7 @@ export function renderBracket(ctx: RenderContext): RenderResult {
   if (finalNode?.winner) {
     newWinners[draw.rootNum] = finalNode.winner;
     const pop = prevWinners[draw.rootNum] !== finalNode.winner ? " pop" : "";
-    const tip = tipFor(draw, model, draw.rootNum, maxLevel, "Champion");
+    const tip = tipFor(draw, model, draw.rootNum, maxLevel, overlay, "Champion");
     const [cx, cy] = geo.pt(0, 0);
     champFlag = {
       x: cx,
@@ -207,7 +266,7 @@ export function renderBracket(ctx: RenderContext): RenderResult {
   // which would conflict with hidden and duplicate the stage-wrap's own label).
   const svg = `<svg viewBox="0 0 1000 1000" aria-hidden="true">${caps}${conns}${center}${dots}</svg>`;
   const allFlags = champFlag ? [...flags, champFlag] : flags;
-  let overlay = "";
+  let tokenHTML = "";
   for (const fl of allFlags) {
     const player = playerById(fl.playerId);
     const bucket = fl.cls.includes("champ") ? CHAMP_WIDTH_BUCKET : FLAG_WIDTH_BUCKET;
@@ -229,24 +288,27 @@ export function renderBracket(ctx: RenderContext): RenderResult {
     // the inner <img> (a real bug caught by golden-path testing: hover/tap
     // silently did nothing because dataset was empty on the wrapper).
     if (src) {
-      overlay += `<div class="flag-wrap ${fl.cls}" ${data} tabindex="0" role="button" style="left:${left}%;top:${top}%">
+      tokenHTML += `<div class="flag-wrap ${fl.cls}" ${data} tabindex="0" role="button" style="left:${left}%;top:${top}%">
         <img class="flag-img" src="${src}" alt="${escapeAttr(alt)}" loading="lazy" decoding="async"
           onerror="this.removeAttribute('src');this.closest('.flag-wrap').classList.add('flag-fallback')"/>
         ${seedBadge}${codeBadge}
       </div>`;
     } else {
-      overlay += `<div class="flag-wrap flag-fallback ${fl.cls}" ${data} tabindex="0" role="button" style="left:${left}%;top:${top}%">
+      tokenHTML += `<div class="flag-wrap flag-fallback ${fl.cls}" ${data} tabindex="0" role="button" style="left:${left}%;top:${top}%">
         <span class="sr-only">${escapeAttr(alt)}</span>${seedBadge}${codeBadge}
       </div>`;
     }
   }
 
-  return { html: svg + overlay, winners: newWinners };
+  return { html: svg + tokenHTML, winners: newWinners };
 }
 
 /** Visually-hidden results list for assistive tech (URS-48): round -> match ->
- * players (with seeds) -> score/schedule, kept in sync with the model. */
-export function renderResultsList(draw: Draw, model: ResolvedModel): string {
+ * players (with seeds) -> score/schedule, kept in sync with the model.
+ * `overlay` is optional (URS-85): omitting it reproduces the pre-feature text
+ * exactly; when present, a node's live score/winner (URS-89) is reflected here
+ * too so screen-reader users see the same live data as sighted users. */
+export function renderResultsList(draw: Draw, model: ResolvedModel, overlay?: LiveOverlay): string {
   const geo = buildGeometry(draw);
   const maxLevel = geo.maxLevel;
   const byLevel: Record<number, number[]> = {};
@@ -259,7 +321,7 @@ export function renderResultsList(draw: Draw, model: ResolvedModel): string {
     const nums = (byLevel[lvl] ?? []).sort((a, b) => a - b);
     html += `<h3>${escapeAttr(roundName(lvl, maxLevel))}</h3><ul>`;
     for (const num of nums) {
-      const node = model[num];
+      const node = effectiveNode(model[num], overlay?.[num]);
       const p1 = sideLabel(draw, model, num, 0);
       const p2 = sideLabel(draw, model, num, 1);
       const player1 = playerById(node?.participants[0] ?? undefined);
@@ -267,8 +329,9 @@ export function renderResultsList(draw: Draw, model: ResolvedModel): string {
       const seed1 = player1?.seed ? ` (seed ${player1.seed})` : "";
       const seed2 = player2?.seed ? ` (seed ${player2.seed})` : "";
       const score = formatScore(node?.score);
+      const liveNote = node?.liveInProgress ? " (live)" : "";
       const scoreLabel = score
-        ? `Result: ${score}${node?.winner ? `, winner ${playerById(node.winner)?.name ?? node.winner}` : ""}`
+        ? `Result: ${score}${liveNote}${node?.winner ? `, winner ${playerById(node.winner)?.name ?? node.winner}` : ""}`
         : `Not yet played — ${formatScheduled(node?.date, node?.time)}`;
       const court = courtName(node?.courtId);
       html += `<li>${escapeAttr(p1)}${seed1} vs ${escapeAttr(p2)}${seed2}. ${escapeAttr(scoreLabel)}${
@@ -277,7 +340,7 @@ export function renderResultsList(draw: Draw, model: ResolvedModel): string {
     }
     html += "</ul>";
   }
-  const champion = model[draw.rootNum]?.winner;
+  const champion = effectiveNode(model[draw.rootNum], overlay?.[draw.rootNum])?.winner;
   html += `<h3>${championRoundName()}</h3><p>${
     champion ? escapeAttr(playerById(champion)?.name ?? champion) : "Not yet decided"
   }</p>`;

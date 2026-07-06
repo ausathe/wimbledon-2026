@@ -399,3 +399,256 @@ outer tokens, which is legible on desktop but cramped on mobile.
 - **CQ-5 (title/wordmark):** Preferred site title given the unofficial constraint — e.g.
   "Wimbledon 2026 — Unofficial Bracket" vs "The Championships 2026 (fan)"? *Default: a title
   that reads clearly as unofficial.*
+
+---
+
+# Feature addendum A — Live scores (URS-78…URS-104)
+
+**Status:** Draft for build (v1) — appended 2026-07-05 by design-agent.
+**Scope:** a *major feature* layered onto the existing, shipped bracket. URS-1…URS-77 remain in
+force and unchanged. This addendum adds live-score fetching, a live scoreboard UI, live-driven
+status, and the degradation contract. Everything below is verified against a REAL data source
+(see §A.0); the developer MUST NOT assume feed capabilities beyond what is listed.
+
+## A.0 Data source (verified, binding — design to this truth, not to assumptions)
+
+- **Source:** the free, keyless, CORS-enabled ESPN public tennis scoreboard API. No backend, no
+  serverless proxy, no API key, no paid tier — the site stays a pure static GitHub Pages build
+  (this constraint is FIXED; do not reopen it).
+  - Men: `https://site.api.espn.com/apis/site/v2/sports/tennis/atp/scoreboard`
+  - Women: `https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard`
+- **Response shape (the only fields the build may rely on):** `events[0]` = current tournament
+  (`events[0].name`, e.g. "Wimbledon"); `events[0].groupings[]` = draws; select the grouping whose
+  name is the singles draw ("Men's Singles" / "Women's Singles"), ignore doubles. Each grouping
+  has `competitions[]` (matches). Each competition exposes: `status.type.state`
+  (`in` | `post` | `pre`), `status.type.detail` / `status.type.shortDetail` (e.g. "5th Set"),
+  optional `situation`, and `competitors[]` (exactly 2), each with `athlete.displayName`,
+  `winner` (bool | null), a server/possession flag (`possession` / `active`), and **`linescores[]`**
+  = per-set scores `{ value, tiebreak?, winner? }`.
+- **What the feed HONESTLY provides:** set-by-set game scores incl. tiebreak point counts, a
+  current-set indicator, server, match state, round/detail text, and (best-effort) court —
+  updating live.
+- **What the feed does NOT reliably provide:** the live *game* point score (0/15/30/40/deuce/adv).
+  The point-by-point summary endpoint is not openly accessible. **This feature MUST NOT claim or
+  imply a live point ticker.** If point data happens to appear in a payload, it MAY be shown as
+  clearly best-effort, never as a required/guaranteed field.
+
+## A.1 Functional — fetch, poll, parse
+
+- **URS-78** On initial load (after the existing local-data render per URS-29/URS-30), the app
+  MUST attempt a client-side `fetch` of **both** scoreboard endpoints (ATP + WTA) directly from
+  the browser. No proxy, no key. The bracket MUST already be usable from local data before the
+  first live response arrives (live data augments; it MUST NOT block first paint — extends URS-55).
+
+- **URS-79** The app MUST re-poll both endpoints on a fixed interval of **15 seconds** (the
+  `POLL_MS` constant). This is the justified cadence: it keeps set/game scores current within a
+  quarter-minute while staying well clear of hammering an unofficial free endpoint (a game rarely
+  completes faster; per-point granularity is unavailable anyway per §A.0). The value MUST be a
+  single named constant so it can be tuned. Polling **≤5s or a per-second network poll is a FAIL**
+  (abuse of a free feed; also unnecessary given no point-level data).
+
+- **URS-80** The two endpoints MUST be fetched **concurrently** each poll, each with a **request
+  timeout** (`FETCH_TIMEOUT_MS`, default 8s, via `AbortController`). A slow/hung request MUST NOT
+  stall the other draw or the tick loop.
+
+- **URS-81** The app MUST select the current Wimbledon event defensively: use `events[0]`, and
+  **only** treat its data as Wimbledon-live when `events[0].name` (or equivalent tournament field)
+  contains "Wimbledon" (case-insensitive). If the current event is a different tournament or
+  off-season (no relevant event), the app MUST treat live data as **absent** and fall back to
+  local data (URS-95) — it MUST NOT render another tournament's scores onto the Wimbledon bracket.
+
+- **URS-82** The parser MUST select, per endpoint, the **singles** grouping only (men's/women's
+  singles by grouping name), and MUST ignore doubles groupings. Missing/renamed groupings MUST
+  degrade to "no live data for this draw", never throw (extends URS-32).
+
+- **URS-83** Parsing MUST be total and defensive: any missing/`null`/unexpected field
+  (`competitors` not length 2, absent `linescores`, non-numeric `value`, absent `status`) MUST be
+  skipped for that match without throwing and without discarding other valid matches. A malformed
+  payload MUST NOT blank or break the bracket (extends URS-32/URS-56).
+
+## A.2 Data model — ESPN → internal live model (adapter)
+
+- **URS-84** A dedicated adapter MUST transform each competition into an internal `LiveMatch`
+  record carrying: both players (as parsed display names + normalized keys), per-set game scores
+  with optional tiebreak point counts, which set is current, who is serving (if given), match
+  state (`in` | `post` | `pre`), round/detail text, court (if given), and a `winner` side (if
+  given). The adapter MUST reuse the existing `SetGames` / `SetScore` shape (`{ games:[a,b],
+  tb?:[a,b]|number }`) for the set grid so the bracket's existing `formatScore` and scoring logic
+  stay the single source of truth for score formatting (URS-24). The ESPN `linescores[i].value`
+  pairs across the two competitors form each set's `games` tuple; `tiebreak` populates `tb`;
+  `winner` on a competitor's final set / `status` populates the winner side.
+
+- **URS-85** The adapter MUST live in its own module tree (`src/live/**`) and MUST NOT modify
+  `src/bracket/**` render/layout/model internals except at the one documented merge point
+  (URS-88). The existing local-data path (URS-30) MUST remain fully functional with the live
+  modules removed/disabled.
+
+## A.3 Reconciliation — feed ↔ existing bracket
+
+- **URS-86** The app MUST match feed players to our modelled players by **normalized name**:
+  lower-case, strip diacritics/accents, collapse whitespace and punctuation, compare against each
+  `players.ts` entry's `name` (and a small alias map for known display-name mismatches). A live
+  match maps to a bracket node when **both** of its players resolve to the two participants of
+  exactly one node in the current draw's resolved model.
+
+- **URS-87** A live match whose players do **not** both resolve to a modelled node (e.g. a player
+  outside our R32 subset, or a name we can't match) MUST NOT corrupt the bracket. It MAY still be
+  shown in the standalone live scoreboard (URS-90) labelled as such, but MUST NOT be forced onto a
+  bracket node. Unmatched-name events MUST be counted/logged (dev `console.warn` only) so the
+  alias map can be extended — never thrown (extends URS-56).
+
+- **URS-88** When a live match maps to a bracket node, the app MUST **overlay** (not overwrite)
+  live data onto that node for rendering: the merge is a render-time layer keyed by node number,
+  never a mutation of the bundled JSON. Precedence: for a node that is `in` (live) or `post` with
+  fresher data than the local snapshot, the live set-grid, live status, and live winner drive the
+  token/tooltip; if live data is absent for a node, the existing local snapshot value is used
+  unchanged. Removing the live layer MUST return the exact pre-feature rendering.
+
+- **URS-89** Live-driven bracket status: a node that the feed reports `state==="in"` MUST show the
+  existing **live** cue (URS-25 pulsing halo + "Live" tooltip state), regardless of the
+  clock-window heuristic. A node the feed reports `state==="post"` with a winner MUST reflect that
+  result (winner highlighted, loser de-emphasised per URS-26) even if the local snapshot had it
+  pending. The clock-based `status.ts` heuristic (URS-25) remains the fallback for nodes with no
+  live-feed coverage.
+
+## A.4 UI — the live scoreboard ("standard tennis scoresheet")
+
+- **URS-90** The app MUST render a **live scoreboard** presenting a standard tennis scoresheet for
+  each ongoing (`in`) match in the two singles draws, and for **recently completed** (`post`)
+  matches from the current day's feed. Each scorecard MUST show, at minimum:
+  - both players' **names** (seed where we know it from `players.ts`; nationality flag where the
+    player resolves to a modelled player — reuse the flag token treatment for consistency);
+  - a **set-by-set game grid**: one column per set, the two players as rows, each cell the games
+    won; a completed-set tiebreak rendered as a **superscript** point count (e.g. `7⁴` for 7–6(4))
+    — the standard scoresheet convention;
+  - the **current set highlighted** (visually distinct column) for `in` matches;
+  - a **server indicator** (e.g. a dot/marker on the serving player's row) when the feed provides
+    possession; absent gracefully when it doesn't;
+  - **match status / round / court**: round or `status.detail` text (e.g. "5th Set", "Final"),
+    court name when available, and a clear **LIVE** badge for `in` matches / final result for
+    `post`.
+
+- **URS-91** The scoreboard MUST NOT claim a live 0/15/30/40 game-point ticker (it is not
+  available — §A.0). Copy MUST describe what is shown honestly ("live set & game scores"), not
+  "point-by-point". Any incidental point data (URS-83) shown MUST be visibly best-effort.
+
+- **URS-92 (placement — defaulted, see CQ-A1)** The live scoreboard MUST be placed as a **panel/
+  rail** in the single-page layout, positioned **directly below the header / above or beside the
+  bracket stage** on desktop (a side rail on wide viewports, a stacked panel that collapses to a
+  horizontally-scrollable strip / accordion on mobile). It MUST NOT overlap or crowd the bracket
+  stage, and MUST preserve the existing centred vertical rhythm (URS-35). Default: a collapsible
+  "Live now" panel above the bracket; the bracket remains the primary element.
+
+- **URS-93** In addition to the scoreboard panel, the existing **custom tooltip** (URS-23/URS-24)
+  MUST be enriched for a bracket node that has live coverage: show the live set grid + "Live"
+  state + server (if any) instead of only the local score/schedule. This reuses the tooltip's
+  existing `TipData` path; no second tooltip system.
+
+- **URS-94** The scoreboard MUST be **on-brand** and consistent with the existing design system:
+  Wimbledon green/purple/gold on ivory, existing tokens (`tokens.css`), serif for headings / sans
+  for scores and labels, existing card/pill radii and spacing. It MUST NOT introduce a new visual
+  language.
+
+## A.5 Update cadence — "every second"
+
+- **URS-95** The **display** MUST tick every **1 second** (`TICK_MS`) independently of the 15s
+  network poll: a live "**updated Xs ago**" relative stamp MUST increment each second, and the
+  LIVE pulse/animation MUST read as continuously alive. The network re-poll (URS-79) and the 1s
+  display tick MUST be two separate timers; the second-tick MUST NOT trigger a network request.
+
+- **URS-96** There MUST be a clear, persistent **LIVE indicator** while ≥1 match is `in`: a
+  pulsing dot/badge (green or purple, AA-contrast on ivory) plus the text "LIVE" and the
+  "updated Xs ago" stamp. When a poll succeeds the stamp resets to "updated just now / 0s".
+
+- **URS-97** On each successful poll the scoreboard and any overlaid bracket nodes MUST re-render
+  with a smooth diff (reuse the existing "pop"/transition vocabulary, URS-27) — a set/game score
+  change MUST NOT cause a full-page or full-bracket layout thrash or a visible flash. Only changed
+  cells/nodes should visibly update.
+
+## A.6 Graceful degradation (critical — the site must never break)
+
+- **URS-98** If **either or both** endpoints are unreachable, time out, return non-2xx, are
+  rate-limited (429), CORS-fail, or return unparseable JSON, the app MUST continue running on the
+  existing **local snapshot data** with the full pre-feature experience intact (URS-1…URS-77). No
+  error may throw, blank the bracket, or spam the console (dev `console.warn` at most, once per
+  failing poll — not per match).
+
+- **URS-99** When there is **no current Wimbledon event** (off-season, or `events[0]` is another
+  tournament — URS-81), the app MUST behave exactly as the local-only build: the live scoreboard
+  MUST show a calm empty state ("No live matches right now — showing the latest bracket"), NOT an
+  error, and the bracket MUST render from local data.
+
+- **URS-100** When the feed is reachable and it IS Wimbledon but **zero singles matches are `in`**,
+  the scoreboard MUST show a "**No matches live right now**" state and MAY show the most recent
+  `post` results of the day. The LIVE indicator MUST NOT pulse when nothing is live.
+
+- **URS-101** The live status line (the existing footer status dot, URS-29) MUST reflect live
+  state honestly: e.g. "Live · updated Xs ago" on success, "Live feed unavailable — showing saved
+  snapshot" on failure. It MUST distinguish *live feed* state from the local dataset's own
+  `updatedAt` stamp (URS-30) without conflating them.
+
+- **URS-102** Repeated poll failures MUST NOT escalate resource use: on consecutive failures the
+  app SHOULD apply a simple backoff (e.g. widen the interval up to a cap, e.g. 60s) and resume the
+  normal 15s cadence once a poll succeeds. It MUST NOT retry in a tight loop.
+
+## A.7 Accessibility
+
+- **URS-103** The live scoreboard MUST be accessible: it MUST be a semantic region with an
+  accessible name (e.g. `<section aria-label="Live scores">`); score changes MUST be announced via
+  a **polite** `aria-live` region that is **not spammy** — announce at most a concise summary on a
+  meaningful change (e.g. "Alcaraz breaks, leads 5–4 in the third" is out of scope for point data;
+  a set/score-line summary or "score updated" throttled to real changes is required), NOT a raw
+  re-read every second. The 1s "updated Xs ago" ticker MUST NOT be in an assertive live region.
+  The scoreboard MUST be keyboard-reachable and readable by a screen reader (the set grid MUST have
+  proper table semantics or equivalent labelled structure, not a bare div grid). Reduced-motion
+  (URS-38/URS-50) MUST disable the LIVE pulse animation (replace with a static "LIVE" label).
+
+## A.8 Performance / quality
+
+- **URS-104** The feature MUST hold the existing quality bar: Lighthouse ≥90 ×4 (URS-52) with
+  polling active; **no console errors** or unhandled promise rejections during load, polling,
+  degradation, or teardown (URS-56); no memory/timer leaks — all intervals and `AbortController`s
+  MUST be cleared on page hide/unload, and polling SHOULD pause when the tab is hidden
+  (`document.visibilitychange` / `hidden`) and resume on focus, to avoid needless background
+  fetches. No layout thrash from polling (URS-97).
+
+## A.9 Labelling / honesty (binding, extends URS-70…URS-73)
+
+- **URS-105** The live data MUST be labelled as **real but unofficial**, crediting the source: a
+  visible note such as "Live scores via ESPN's public feed — unofficial, may lag or differ from
+  official Wimbledon scoring." The existing fan/unofficial disclaimer (URS-70) stays. The site MUST
+  NOT present live data as official Wimbledon data, and MUST NOT claim point-by-point (URS-91).
+
+## A.10 Definition of done — live-scores feature (test-agent GREEN for this addendum)
+
+- **URS-106** Every MUST in URS-78…URS-105 PASSES; every SHOULD PASSES or has written design
+  sign-off. Specifically verified:
+  1. With the live feed reachable and Wimbledon in progress: ongoing singles matches appear in the
+     scoreboard with a correct set-by-set grid (tiebreak superscripts), current set highlighted,
+     server where given, LIVE badge, and the "updated Xs ago" stamp ticking each second; matched
+     matches also drive the bracket node's live status/score and tooltip.
+  2. With the feed **blocked/offline** (simulate: block the ESPN host / offline): the site runs on
+     local snapshot data with zero errors, a calm "feed unavailable — showing saved snapshot"
+     status, and the full URS-1…URS-77 experience intact.
+  3. With the feed reachable but **no live matches** (or a non-Wimbledon event): a calm empty
+     state, no pulsing LIVE indicator, bracket from local data.
+  4. Responsive (mobile/tablet/desktop), keyboard + screen-reader operable scoreboard,
+     reduced-motion disables the pulse, Lighthouse ≥90 ×4, no console errors, timers/aborts cleaned
+     up on unload and paused when hidden.
+  5. Honest labelling present: unofficial ESPN-source credit, no point-by-point claim, fan
+     disclaimer intact.
+
+## Appendix A-live — Open clarifying questions (for the client, via orchestrator)
+
+- **CQ-A1 (scoreboard placement):** Default = a collapsible **"Live now" panel above the bracket**
+  (side rail on wide screens). Alternative = a persistent **side rail beside the bracket** on
+  desktop only, or **tooltip-only** (no separate panel). *Default assumed: panel above / rail
+  beside.*
+- **CQ-A2 (drive bracket tokens live vs panel-only):** Default = **both** — matched live matches
+  drive the bracket node's status/score/tooltip (URS-88/URS-89) *and* appear in the panel.
+  Alternative = **panel-only** (leave the bracket entirely on local snapshot data, show live only
+  in the scoreboard). Driving the bracket live is the more impressive, coherent option and is the
+  default; panel-only is simpler/safer if the client prefers the bracket to stay a stable snapshot.
+  *Default assumed: drive both.*
+- **CQ-A3 (recently-completed matches):** Default = the scoreboard shows `in` matches plus that
+  **day's** `post` results. Alternative = `in`-only. *Default assumed: include today's completed.*

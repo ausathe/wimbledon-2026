@@ -1,10 +1,12 @@
 ---
 import Header from "../components/Header.astro";
 import CourtsControl from "../components/CourtsControl.astro";
+import LiveScoreboard from "../components/LiveScoreboard.astro";
 import Footer from "../components/Footer.astro";
 import "../styles/tokens.css";
 import "../styles/global.css";
 import "../styles/bracket.css";
+import "../styles/live.css";
 
 const base = import.meta.env.BASE_URL;
 const siteUrl = Astro.site ?? new URL("https://example.github.io");
@@ -44,6 +46,7 @@ const description =
     <a class="skip-link" href="#main-content">Skip to bracket</a>
     <Header />
     <main id="main-content">
+      <LiveScoreboard />
       <div
         id="stage-wrap"
         role="group"

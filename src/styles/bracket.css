@@ -394,6 +394,46 @@
   color: #a99;
 }
 
+/* Live-feed tooltip enrichment (URS-93): reuses the tt- vocabulary above, no
+   second tooltip system, no new palette. */
+.tooltip .tt-live-tag {
+  font-size: 10px;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #ffb0e0;
+}
+.tooltip .tt-live-tag .live-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff7ad1;
+  margin-right: 5px;
+  vertical-align: middle;
+  animation: livePulse 1.7s ease-in-out infinite;
+}
+.tooltip .tt-serving {
+  margin-top: 3px;
+  font-size: 11px;
+  color: #cfc9bd;
+}
+.tooltip .tt-serving .serve-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold-bright);
+  margin-right: 5px;
+  vertical-align: middle;
+}
+.tooltip .tt-live-credit {
+  margin-top: 4px;
+  font-size: 10px;
+  font-style: italic;
+  color: #cfc9bd;
+}
+
 /* Reduced motion (URS-38, URS-50): kill non-essential animation entirely. */
 @media (prefers-reduced-motion: reduce) {
   .flag-wrap.pop {
@@ -401,7 +441,8 @@
   }
   .flag-wrap.deck .flag-img,
   .flag-wrap.live .flag-img,
-  .tooltip .tt-score.live .live-dot {
+  .tooltip .tt-score.live .live-dot,
+  .tooltip .tt-live-tag .live-dot {
     animation: none;
   }
   .flag-img,

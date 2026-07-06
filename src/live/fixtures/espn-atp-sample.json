@@ -1,0 +1,343 @@
+{
+  "_fixtureNote": "Curated, trimmed excerpt of a REAL captured payload from https://site.api.espn.com/apis/site/v2/sports/tennis/atp/scoreboard (captured 2026-07-05). Shape is authoritative for adapter.ts. Includes: 3 real 'in' (live) matches whose players resolve to our R32 dataset (players.ts), 2 real 'post' matches, 1 'pre' match, and deliberately malformed/edge-case competitions appended at the end to exercise adapter defensiveness (URS-83) -- these do NOT come from the live feed and are clearly marked.",
+  "events": [
+    {
+      "id": "188-2026",
+      "name": "Wimbledon",
+      "date": "2026-06-22T04:00Z",
+      "groupings": [
+        {
+          "grouping": { "id": "1", "slug": "mens-singles", "displayName": "Men's Singles" },
+          "competitions": [
+            {
+              "id": "177476",
+              "date": "2026-07-05T18:20Z",
+              "status": {
+                "type": {
+                  "id": "2",
+                  "name": "STATUS_IN_PROGRESS",
+                  "state": "in",
+                  "completed": false,
+                  "description": "In Progress",
+                  "detail": "2nd Set",
+                  "shortDetail": "2nd"
+                }
+              },
+              "venue": { "fullName": "London, Great Britain", "court": "Centre Court" },
+              "situation": { "onFirst": false, "onSecond": false, "onThird": false },
+              "competitors": [
+                {
+                  "id": "7608",
+                  "order": 2,
+                  "homeAway": "away",
+                  "possession": false,
+                  "linescores": [{ "value": 3.0, "winner": false }, { "value": 0.0 }],
+                  "athlete": { "displayName": "Shintaro Mochizuki" }
+                },
+                {
+                  "id": "3623",
+                  "order": 1,
+                  "homeAway": "home",
+                  "possession": true,
+                  "linescores": [{ "value": 6.0, "winner": true }, { "value": 0.0 }],
+                  "athlete": { "displayName": "Jannik Sinner" }
+                }
+              ]
+            },
+            {
+              "id": "177488",
+              "date": "2026-07-05T15:45Z",
+              "status": {
+                "type": {
+                  "id": "2",
+                  "name": "STATUS_IN_PROGRESS",
+                  "state": "in",
+                  "completed": false,
+                  "description": "In Progress",
+                  "detail": "4th Set",
+                  "shortDetail": "4th"
+                }
+              },
+              "venue": { "fullName": "London, Great Britain", "court": "No. 2 Court" },
+              "situation": { "onFirst": false, "onSecond": false, "onThird": false },
+              "competitors": [
+                {
+                  "id": "2337",
+                  "order": 2,
+                  "homeAway": "away",
+                  "possession": false,
+                  "linescores": [
+                    { "value": 3.0, "winner": false },
+                    { "value": 6.0, "tiebreak": 5, "winner": false },
+                    { "value": 7.0, "tiebreak": 7, "winner": true },
+                    { "value": 6.0 }
+                  ],
+                  "athlete": { "displayName": "Jan-Lennard Struff" }
+                },
+                {
+                  "id": "2726",
+                  "order": 1,
+                  "homeAway": "home",
+                  "possession": true,
+                  "linescores": [
+                    { "value": 6.0, "winner": true },
+                    { "value": 7.0, "tiebreak": 7, "winner": true },
+                    { "value": 6.0, "tiebreak": 2, "winner": false },
+                    { "value": 5.0 }
+                  ],
+                  "athlete": { "displayName": "Hubert Hurkacz" }
+                }
+              ]
+            },
+            {
+              "id": "177485",
+              "date": "2026-07-05T14:45Z",
+              "status": {
+                "type": {
+                  "id": "2",
+                  "name": "STATUS_IN_PROGRESS",
+                  "state": "in",
+                  "completed": false,
+                  "description": "In Progress",
+                  "detail": "5th Set",
+                  "shortDetail": "5th"
+                }
+              },
+              "venue": { "fullName": "London, Great Britain", "court": "No. 1 Court" },
+              "situation": { "onFirst": false, "onSecond": false, "onThird": false },
+              "competitors": [
+                {
+                  "id": "3212",
+                  "order": 2,
+                  "homeAway": "away",
+                  "possession": true,
+                  "linescores": [
+                    { "value": 7.0, "tiebreak": 7, "winner": true },
+                    { "value": 6.0, "tiebreak": 6, "winner": false },
+                    { "value": 3.0, "winner": false },
+                    { "value": 7.0, "tiebreak": 7, "winner": true },
+                    { "value": 0.0 }
+                  ],
+                  "athlete": { "displayName": "Alejandro Davidovich Fokina" }
+                },
+                {
+                  "id": "3209",
+                  "order": 1,
+                  "homeAway": "home",
+                  "possession": false,
+                  "linescores": [
+                    { "value": 6.0, "tiebreak": 4, "winner": false },
+                    { "value": 7.0, "tiebreak": 8, "winner": true },
+                    { "value": 6.0, "winner": true },
+                    { "value": 6.0, "tiebreak": 2, "winner": false },
+                    { "value": 5.0 }
+                  ],
+                  "athlete": { "displayName": "Felix Auger-Aliassime" }
+                }
+              ]
+            },
+            {
+              "id": "177478",
+              "date": "2026-07-03T13:40Z",
+              "status": {
+                "type": {
+                  "id": "3",
+                  "name": "STATUS_FINAL",
+                  "state": "post",
+                  "completed": true,
+                  "description": "Final",
+                  "detail": "Final",
+                  "shortDetail": "Final"
+                }
+              },
+              "venue": { "fullName": "London, Great Britain", "court": "No. 1 Court" },
+              "competitors": [
+                {
+                  "id": "3621",
+                  "order": 2,
+                  "homeAway": "away",
+                  "winner": false,
+                  "linescores": [
+                    { "value": 4.0, "winner": false },
+                    { "value": 3.0, "winner": false },
+                    { "value": 4.0, "winner": false }
+                  ],
+                  "athlete": { "displayName": "Jenson Brooksby" }
+                },
+                {
+                  "id": "3623",
+                  "order": 1,
+                  "homeAway": "home",
+                  "winner": true,
+                  "linescores": [
+                    { "value": 6.0, "winner": true },
+                    { "value": 6.0, "winner": true },
+                    { "value": 6.0, "winner": true }
+                  ],
+                  "athlete": { "displayName": "Jannik Sinner" }
+                }
+              ]
+            },
+            {
+              "id": "177392",
+              "date": "2026-07-01T12:35Z",
+              "status": {
+                "type": {
+                  "id": "3",
+                  "name": "STATUS_FINAL",
+                  "state": "post",
+                  "completed": true,
+                  "description": "Final",
+                  "detail": "Final",
+                  "shortDetail": "Final"
+                }
+              },
+              "venue": { "fullName": "London, Great Britain", "court": "Centre Court" },
+              "competitors": [
+                {
+                  "id": "9999",
+                  "order": 2,
+                  "homeAway": "away",
+                  "winner": false,
+                  "linescores": [
+                    { "value": 6.0, "tiebreak": 4, "winner": false },
+                    { "value": 6.0, "tiebreak": 2, "winner": false },
+                    { "value": 4.0, "winner": false }
+                  ],
+                  "athlete": { "displayName": "Nuno Borges" }
+                },
+                {
+                  "id": "3623",
+                  "order": 1,
+                  "homeAway": "home",
+                  "winner": true,
+                  "linescores": [
+                    { "value": 7.0, "tiebreak": 7, "winner": true },
+                    { "value": 7.0, "tiebreak": 7, "winner": true },
+                    { "value": 6.0, "winner": true }
+                  ],
+                  "athlete": { "displayName": "Jannik Sinner" }
+                }
+              ]
+            },
+            {
+              "id": "177999",
+              "date": "2026-07-06T13:00Z",
+              "status": {
+                "type": {
+                  "id": "1",
+                  "name": "STATUS_SCHEDULED",
+                  "state": "pre",
+                  "completed": false,
+                  "description": "Scheduled",
+                  "detail": "Scheduled",
+                  "shortDetail": "Sat"
+                }
+              },
+              "venue": { "fullName": "London, Great Britain", "court": "Centre Court" },
+              "competitors": [
+                {
+                  "id": "1001",
+                  "order": 2,
+                  "homeAway": "away",
+                  "linescores": [],
+                  "athlete": { "displayName": "Some Future Player" }
+                },
+                {
+                  "id": "1002",
+                  "order": 1,
+                  "homeAway": "home",
+                  "linescores": [],
+                  "athlete": { "displayName": "Another Future Player" }
+                }
+              ]
+            },
+            {
+              "_note": "MALFORMED (synthetic, not from live feed): only 1 competitor -- must be skipped without throwing (URS-83).",
+              "id": "bad-1",
+              "status": { "type": { "state": "in", "detail": "1st Set" } },
+              "competitors": [{ "id": "1", "athlete": { "displayName": "Solo Player" }, "linescores": [] }]
+            },
+            {
+              "_note": "MALFORMED (synthetic): missing status entirely -- must be skipped.",
+              "id": "bad-2",
+              "competitors": [
+                { "id": "1", "athlete": { "displayName": "A" }, "linescores": [] },
+                { "id": "2", "athlete": { "displayName": "B" }, "linescores": [] }
+              ]
+            },
+            {
+              "_note": "MALFORMED (synthetic): non-numeric linescore value -- that set should be skipped, match still parsed.",
+              "id": "bad-3",
+              "status": {
+                "type": { "state": "in", "detail": "1st Set" }
+              },
+              "venue": { "court": "Court 12" },
+              "competitors": [
+                {
+                  "id": "1",
+                  "athlete": { "displayName": "Weird Data Player One" },
+                  "linescores": [{ "value": "not-a-number" }, { "value": 4 }]
+                },
+                {
+                  "id": "2",
+                  "athlete": { "displayName": "Weird Data Player Two" },
+                  "linescores": [{ "value": 3 }, { "value": 6 }]
+                }
+              ]
+            },
+            {
+              "_note": "MALFORMED (synthetic): athlete missing displayName -- must be skipped.",
+              "id": "bad-4",
+              "status": { "type": { "state": "post", "detail": "Final" } },
+              "competitors": [
+                { "id": "1", "athlete": {}, "linescores": [{ "value": 6 }] },
+                { "id": "2", "athlete": { "displayName": "Has A Name" }, "linescores": [{ "value": 2 }] }
+              ]
+            },
+            {
+              "_note": "Unmatchable real-shaped match (synthetic name not in players.ts) -- should surface in panel unmatched, not crash bracket overlay (URS-87).",
+              "id": "unmatched-1",
+              "status": {
+                "type": { "state": "in", "detail": "1st Set" }
+              },
+              "venue": { "court": "Court 18" },
+              "competitors": [
+                {
+                  "id": "5001",
+                  "order": 2,
+                  "homeAway": "away",
+                  "possession": true,
+                  "linescores": [{ "value": 4 }],
+                  "athlete": { "displayName": "Totally Unknown Player" }
+                },
+                {
+                  "id": "5002",
+                  "order": 1,
+                  "homeAway": "home",
+                  "possession": false,
+                  "linescores": [{ "value": 3 }],
+                  "athlete": { "displayName": "Another Unknown One" }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "grouping": { "id": "3", "slug": "mens-doubles", "displayName": "Men's Doubles" },
+          "competitions": [
+            {
+              "_note": "Doubles grouping must be ignored entirely by the adapter (URS-82).",
+              "id": "doubles-1",
+              "status": { "type": { "state": "in", "detail": "1st Set" } },
+              "competitors": [
+                { "id": "1", "athlete": { "displayName": "Doubles A" }, "linescores": [{ "value": 4 }] },
+                { "id": "2", "athlete": { "displayName": "Doubles B" }, "linescores": [{ "value": 3 }] }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

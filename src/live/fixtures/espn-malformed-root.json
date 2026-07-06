@@ -1,0 +1,3 @@
+{
+  "_fixtureNote": "Grossly malformed/unexpected top-level shape (no events key at all) -- adapter must degrade to no live data, never throw (URS-83, URS-98)."
+}

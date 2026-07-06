@@ -1,0 +1,103 @@
+{
+  "_fixtureNote": "Curated, trimmed excerpt of a REAL captured payload from https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard (captured 2026-07-05). No 'in' matches were live in this women's singles snapshot at capture time -- this fixture exercises the 'zero live, some post today' path (URS-100) plus a real completed R32 pairing that resolves against players.ts (Pegula/Jovic).",
+  "events": [
+    {
+      "id": "188-2026",
+      "name": "Wimbledon",
+      "date": "2026-06-22T04:00Z",
+      "groupings": [
+        {
+          "grouping": { "id": "2", "slug": "womens-singles", "displayName": "Women's Singles" },
+          "competitions": [
+            {
+              "id": "177702",
+              "date": "2026-07-05T12:05Z",
+              "status": {
+                "type": {
+                  "id": "3",
+                  "name": "STATUS_FINAL",
+                  "state": "post",
+                  "completed": true,
+                  "description": "Final",
+                  "detail": "Final",
+                  "shortDetail": "Final"
+                }
+              },
+              "venue": { "fullName": "London, Great Britain", "court": "No. 1 Court" },
+              "competitors": [
+                {
+                  "id": "14311",
+                  "order": 2,
+                  "homeAway": "away",
+                  "winner": false,
+                  "linescores": [
+                    { "value": 6.0, "winner": true },
+                    { "value": 3.0, "winner": false },
+                    { "value": 1.0, "winner": false }
+                  ],
+                  "athlete": { "displayName": "Iva Jovic" }
+                },
+                {
+                  "id": "2113",
+                  "order": 1,
+                  "homeAway": "home",
+                  "winner": true,
+                  "linescores": [
+                    { "value": 4.0, "winner": false },
+                    { "value": 6.0, "winner": true },
+                    { "value": 6.0, "winner": true }
+                  ],
+                  "athlete": { "displayName": "Jessica Pegula" }
+                }
+              ]
+            },
+            {
+              "id": "177575",
+              "date": "2026-07-04T12:00Z",
+              "status": {
+                "type": {
+                  "id": "3",
+                  "name": "STATUS_FINAL",
+                  "state": "post",
+                  "completed": true,
+                  "description": "Final",
+                  "detail": "Final",
+                  "shortDetail": "Final"
+                }
+              },
+              "venue": { "fullName": "London, Great Britain", "court": "Centre Court" },
+              "competitors": [
+                {
+                  "id": "1",
+                  "order": 2,
+                  "homeAway": "away",
+                  "winner": false,
+                  "linescores": [
+                    { "value": 2.0, "winner": false },
+                    { "value": 4.0, "winner": false }
+                  ],
+                  "athlete": { "displayName": "Teodora Kostovic" }
+                },
+                {
+                  "id": "2",
+                  "order": 1,
+                  "homeAway": "home",
+                  "winner": true,
+                  "linescores": [
+                    { "value": 6.0, "winner": true },
+                    { "value": 6.0, "winner": true }
+                  ],
+                  "athlete": { "displayName": "Aryna Sabalenka" }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "grouping": { "id": "4", "slug": "womens-doubles", "displayName": "Women's Doubles" },
+          "competitions": []
+        }
+      ]
+    }
+  ]
+}

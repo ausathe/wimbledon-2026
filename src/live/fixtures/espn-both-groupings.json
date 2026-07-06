@@ -1,0 +1,42 @@
+{
+  "_fixtureNote": "Mirrors a REAL discovery made during this build: both the ATP and WTA public scoreboard endpoints return the SAME full tournament payload, including BOTH 'Men's Singles' and 'Women's Singles' groupings in every response (not gender-scoped as the URL might suggest). This fixture has both groupings in one payload so the adapter's gender filter can be regression-tested precisely: parsing this with genderWord='men' must yield ONLY the men's match, and genderWord='women' must yield ONLY the women's match.",
+  "events": [
+    {
+      "id": "188-2026",
+      "name": "Wimbledon",
+      "date": "2026-06-22T04:00Z",
+      "groupings": [
+        {
+          "grouping": { "id": "1", "slug": "mens-singles", "displayName": "Men's Singles" },
+          "competitions": [
+            {
+              "id": "men-1",
+              "date": "2026-07-05T14:00Z",
+              "status": { "type": { "state": "in", "detail": "1st Set" } },
+              "venue": { "court": "Centre Court" },
+              "competitors": [
+                { "id": "1", "athlete": { "displayName": "Man Player One" }, "linescores": [{ "value": 3 }] },
+                { "id": "2", "athlete": { "displayName": "Man Player Two" }, "linescores": [{ "value": 2 }] }
+              ]
+            }
+          ]
+        },
+        {
+          "grouping": { "id": "2", "slug": "womens-singles", "displayName": "Women's Singles" },
+          "competitions": [
+            {
+              "id": "women-1",
+              "date": "2026-07-05T14:00Z",
+              "status": { "type": { "state": "in", "detail": "1st Set" } },
+              "venue": { "court": "No. 1 Court" },
+              "competitors": [
+                { "id": "3", "athlete": { "displayName": "Woman Player One" }, "linescores": [{ "value": 4 }] },
+                { "id": "4", "athlete": { "displayName": "Woman Player Two" }, "linescores": [{ "value": 1 }] }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

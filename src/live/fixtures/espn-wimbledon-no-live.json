@@ -1,0 +1,29 @@
+{
+  "_fixtureNote": "Wimbledon event, singles grouping present, but zero 'in' matches and zero 'post' matches today -- exercises the 'no matches live right now' calm empty state distinct from off-season (URS-100).",
+  "events": [
+    {
+      "id": "188-2026",
+      "name": "Wimbledon",
+      "date": "2026-06-22T04:00Z",
+      "groupings": [
+        {
+          "grouping": { "id": "1", "slug": "mens-singles", "displayName": "Men's Singles" },
+          "competitions": [
+            {
+              "id": "1",
+              "date": "2026-07-06T13:00Z",
+              "status": {
+                "type": { "id": "1", "name": "STATUS_SCHEDULED", "state": "pre", "detail": "Scheduled" }
+              },
+              "venue": { "court": "Centre Court" },
+              "competitors": [
+                { "id": "1", "athlete": { "displayName": "Future Player A" }, "linescores": [] },
+                { "id": "2", "athlete": { "displayName": "Future Player B" }, "linescores": [] }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

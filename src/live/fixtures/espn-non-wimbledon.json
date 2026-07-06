@@ -1,0 +1,25 @@
+{
+  "_fixtureNote": "Simulates the off-season / another-tournament case (URS-81, URS-99): events[0].name does not contain 'Wimbledon', so the adapter must return no live matches and the app must fall back to local data.",
+  "events": [
+    {
+      "id": "999-2026",
+      "name": "US Open",
+      "date": "2026-08-31T04:00Z",
+      "groupings": [
+        {
+          "grouping": { "id": "1", "slug": "mens-singles", "displayName": "Men's Singles" },
+          "competitions": [
+            {
+              "id": "1",
+              "status": { "type": { "state": "in", "detail": "1st Set" } },
+              "competitors": [
+                { "id": "1", "athlete": { "displayName": "Player A" }, "linescores": [{ "value": 3 }] },
+                { "id": "2", "athlete": { "displayName": "Player B" }, "linescores": [{ "value": 2 }] }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

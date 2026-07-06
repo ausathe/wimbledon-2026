@@ -1,0 +1,268 @@
+/* ============================================================================
+   Live scoreboard panel styling (URS-92, URS-94, URS-96, URS-103). Reuses
+   tokens.css custom properties -- no new palette, no new visual language.
+   Placement: collapsible panel above the bracket by default (URS-92); becomes
+   a side rail on wide viewports via the flex layout below.
+============================================================================ */
+
+.live-scoreboard {
+  width: min(94vw, 920px);
+  margin: 14px auto 0;
+  background: var(--card);
+  border: 1px solid rgba(23, 50, 31, 0.15);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.live-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  cursor: pointer;
+  font: 700 15px/1.2 var(--font-serif);
+  color: var(--ink);
+  list-style: none;
+}
+.live-summary::-webkit-details-marker {
+  display: none;
+}
+.live-summary::before {
+  content: "▸";
+  font-size: 12px;
+  color: var(--muted);
+  transition: transform 0.15s ease;
+}
+details[open] > .live-summary::before {
+  transform: rotate(90deg);
+}
+.live-summary:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: -2px;
+}
+
+.live-title {
+  flex: 0 0 auto;
+}
+
+.ls-badge-header {
+  flex: 0 0 auto;
+  font: 700 10.5px/1 var(--font-sans);
+  letter-spacing: 0.6px;
+  padding: 4px 9px;
+  border-radius: var(--radius-pill);
+  background: #efe7f7;
+  color: var(--purple);
+  border: 1px solid rgba(75, 46, 131, 0.35);
+}
+.ls-badge-header.ls-pulsing {
+  background: var(--purple);
+  color: #fff;
+  animation: lsHeaderPulse 2.2s ease-in-out infinite;
+}
+@keyframes lsHeaderPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(75, 46, 131, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(75, 46, 131, 0);
+  }
+}
+
+.live-ago {
+  flex: 1 1 auto;
+  text-align: right;
+  font: 500 12px/1 var(--font-sans);
+  color: var(--muted);
+}
+
+.live-cards {
+  padding: 4px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  /* Reserve space close to the eventual populated size so the "Connecting…"
+     -> real cards swap (once the first poll resolves) causes minimal
+     cumulative layout shift (CLS) -- the bracket below never jumps once the
+     live feed responds. Content that needs more room still grows normally;
+     this is a floor, not a cap. */
+  min-height: 76px;
+}
+@media (min-width: 1200px) {
+  .live-cards {
+    min-height: 220px;
+  }
+}
+
+.live-credit {
+  margin: 0;
+  padding: 10px 18px 14px;
+  font-size: 11px;
+  color: var(--muted);
+  border-top: 1px solid rgba(23, 50, 31, 0.1);
+}
+.live-credit a {
+  color: var(--green);
+}
+
+.ls-empty {
+  margin: 8px 4px;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* Scorecards: real <table> for a11y (URS-103), on-brand card styling. */
+.ls-card {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg);
+  border: 1px solid rgba(23, 50, 31, 0.12);
+  border-radius: 10px;
+  overflow: hidden;
+  font: 13px/1.3 var(--font-sans);
+}
+.ls-card .ls-meta-row td {
+  padding: 7px 10px;
+  background: rgba(75, 46, 131, 0.05);
+  border-bottom: 1px solid rgba(23, 50, 31, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ls-badge {
+  font: 700 10px/1 var(--font-sans);
+  letter-spacing: 0.6px;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+.ls-badge.ls-live {
+  background: var(--purple);
+  color: #fff;
+}
+.ls-live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  margin-right: 5px;
+  animation: livePulse 1.7s ease-in-out infinite;
+}
+.ls-badge.ls-final {
+  background: #e5e0d3;
+  color: var(--ink);
+}
+.ls-status {
+  color: var(--muted);
+  font-size: 12px;
+}
+.ls-card th,
+.ls-card td {
+  padding: 8px 10px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.ls-card thead tr:nth-child(2) th {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  font-weight: 700;
+  border-bottom: 1px solid rgba(23, 50, 31, 0.12);
+}
+.ls-name-col {
+  text-align: left !important;
+  min-width: 150px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.ls-flag {
+  width: 18px;
+  height: 13px;
+  object-fit: cover;
+  border-radius: 2px;
+  vertical-align: middle;
+  margin-right: 6px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+.ls-flag-fallback {
+  display: inline-block;
+  width: 18px;
+  height: 13px;
+  background: #cfc9bd;
+  border-radius: 2px;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+.ls-seed {
+  font-weight: 500;
+  color: var(--muted);
+  font-size: 11px;
+}
+.ls-serve-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold-bright);
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.ls-tb {
+  font-size: 9px;
+  margin-left: 1px;
+}
+.ls-current-col {
+  background: rgba(200, 162, 74, 0.16);
+  font-weight: 700;
+}
+tr.ls-winner .ls-name-col {
+  color: var(--green);
+  font-weight: 700;
+}
+tr.ls-loser .ls-name-col {
+  color: var(--muted);
+  font-weight: 500;
+}
+tr.ls-loser td:not(.ls-name-col) {
+  color: var(--muted);
+}
+
+/* Side-rail layout on wide viewports (CQ-A1 default: panel above bracket on
+   all sizes -- kept as a simple stacked block; a true side rail is left as a
+   documented enhancement point, see CLAUDE.md "Live scores" section). */
+@media (min-width: 1200px) {
+  .live-scoreboard {
+    width: min(94vw, 1080px);
+  }
+  .live-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .live-summary {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+  .ls-name-col {
+    min-width: 110px;
+  }
+  .ls-card th,
+  .ls-card td {
+    padding: 6px 6px;
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ls-badge-header.ls-pulsing,
+  .ls-live-dot {
+    animation: none;
+  }
+}
