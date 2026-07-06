@@ -2,6 +2,9 @@
 dist/
 .astro/
 
+# ad-hoc QA screenshots (visual review only, not committed)
+.qa-screens/
+
 # dependencies
 node_modules/
 

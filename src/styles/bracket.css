@@ -300,12 +300,12 @@
   transform-origin: 0 0;
   background: var(--ink);
   color: var(--bg);
-  padding: 8px 14px;
-  border-radius: 10px;
-  font: 13px/1.4 var(--font-sans);
+  padding: 9px 15px;
+  border-radius: var(--radius-card-sm);
+  font: 13px/1.45 var(--font-sans);
   text-align: center;
   white-space: nowrap;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--card-shadow-lg);
   opacity: 0;
   transform: scale(var(--tts)) translate(-50%, -100%) translateY(-6px) scale(0.96);
   transition:
@@ -355,6 +355,7 @@
   font-size: 15px;
   font-weight: 800;
   white-space: normal;
+  font-variant-numeric: tabular-nums;
 }
 .tooltip .tt-score.pending {
   font-size: 12px;

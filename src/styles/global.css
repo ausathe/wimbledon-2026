@@ -57,20 +57,22 @@ button:focus-visible {
 
 header.site-header {
   text-align: center;
-  padding: 22px 16px 6px;
+  padding: var(--space-6) 16px var(--space-2);
   max-width: 760px;
 }
 header.site-header h1 {
   margin: 0;
   font-family: var(--font-serif);
-  font-size: clamp(26px, 4.6vw, 42px);
+  font-size: clamp(28px, 4.6vw, 44px);
   font-weight: 700;
   letter-spacing: 0.2px;
+  line-height: 1.12;
   color: var(--ink);
 }
 header.site-header .sub {
-  margin: 6px 0 0;
+  margin: 8px 0 0;
   font-size: clamp(13px, 1.6vw, 15px);
+  letter-spacing: 0.1px;
   color: var(--muted);
 }
 header.site-header .edition {
@@ -79,43 +81,46 @@ header.site-header .edition {
 }
 .unofficial-badge {
   display: inline-block;
-  margin-top: 10px;
-  font-size: 11.5px;
-  letter-spacing: 0.5px;
+  margin-top: var(--space-3);
+  font-size: 11px;
+  letter-spacing: 0.6px;
   text-transform: uppercase;
   font-weight: 700;
   color: var(--purple);
   background: #efe7f7;
-  border: 1px solid rgba(75, 46, 131, 0.35);
+  border: 1px solid rgba(75, 46, 131, 0.32);
   border-radius: var(--radius-pill);
-  padding: 4px 12px;
+  padding: 5px 13px;
 }
 
 .placeholder-banner {
   max-width: 720px;
-  margin: 12px 16px 0;
-  padding: 10px 16px;
+  margin: var(--space-4) 16px 0;
+  padding: 11px 18px;
   border-radius: var(--radius-card);
   background: #fff8e6;
-  border: 1px solid rgba(125, 95, 40, 0.35);
+  border: 1px solid rgba(125, 95, 40, 0.3);
+  box-shadow: var(--card-shadow-sm);
   color: var(--gold);
   font-size: 13px;
   text-align: center;
-  line-height: 1.45;
+  line-height: 1.5;
 }
 
 /* Draw toggle (URS-2, URS-37, URS-47) */
 .draw-toggle {
   display: flex;
-  gap: 8px;
-  margin: 18px 0 2px;
-  border: 1px solid rgba(23, 50, 31, 0.18);
+  gap: 6px;
+  margin: var(--space-5) 0 var(--space-1);
+  border: 1px solid rgba(23, 50, 31, 0.16);
   border-radius: var(--radius-pill);
   padding: 4px;
   background: var(--card);
+  box-shadow: var(--card-shadow-sm);
 }
 .draw-toggle button {
   font: 600 14px/1 var(--font-sans);
+  letter-spacing: 0.1px;
   color: var(--muted);
   background: none;
   border: none;
@@ -124,7 +129,8 @@ header.site-header .edition {
   cursor: pointer;
   transition:
     background 0.15s ease,
-    color 0.15s ease;
+    color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 .draw-toggle button:hover {
   color: var(--ink);
@@ -132,6 +138,7 @@ header.site-header .edition {
 .draw-toggle button.active {
   color: #fff;
   background: var(--green);
+  box-shadow: 0 2px 8px rgba(0, 84, 58, 0.28);
 }
 
 main {
@@ -145,24 +152,29 @@ main {
 /* Courts control (URS-12…URS-18, URS-37, URS-47) */
 .controls {
   text-align: center;
-  margin-top: 4px;
+  margin-top: var(--space-2);
   width: 100%;
 }
 .courts-toggle {
   font: 600 13px/1 var(--font-sans);
+  letter-spacing: 0.1px;
   color: var(--muted);
-  background: none;
-  border: 1px solid rgba(23, 50, 31, 0.25);
+  background: var(--card);
+  border: 1px solid rgba(23, 50, 31, 0.22);
   border-radius: var(--radius-pill);
-  padding: 8px 18px;
+  padding: 9px 19px;
   cursor: pointer;
+  box-shadow: var(--card-shadow-sm);
   transition:
     color 0.15s ease,
-    border-color 0.15s ease;
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
 }
 .courts-toggle:hover {
   color: var(--ink);
   border-color: var(--ink);
+  transform: translateY(-1px);
 }
 .courts-toggle.on {
   color: var(--ink);
@@ -176,7 +188,7 @@ main {
   justify-content: center;
   gap: 8px;
   width: min(94vw, 920px);
-  margin: 14px auto 4px;
+  margin: var(--space-4) auto var(--space-1);
   padding: 0;
   list-style: none;
 }
@@ -185,26 +197,30 @@ main {
 }
 .court-pill {
   font: 600 12.5px/1 var(--font-sans);
+  letter-spacing: 0.1px;
   color: var(--ink);
   background: #fff;
-  border: 1px solid rgba(23, 50, 31, 0.2);
+  border: 1px solid rgba(23, 50, 31, 0.18);
   border-radius: var(--radius-pill);
-  padding: 6px 14px;
+  padding: 7px 15px;
   cursor: pointer;
+  box-shadow: var(--card-shadow-sm);
   transition:
-    border-color 0.15s,
-    box-shadow 0.15s;
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
 }
 .court-pill.roofed {
   background: #f2edf8;
-  border-color: rgba(75, 46, 131, 0.35);
+  border-color: rgba(75, 46, 131, 0.32);
 }
 .court-pill.open {
   background: #eef4ef;
-  border-color: rgba(0, 103, 71, 0.3);
+  border-color: rgba(0, 103, 71, 0.28);
 }
 .court-pill:hover {
   border-color: var(--gold-bright);
+  transform: translateY(-1px);
 }
 .court-pill.sel {
   border-color: var(--gold-bright);
@@ -231,11 +247,12 @@ main {
   width: auto;
   height: auto;
   max-width: 720px;
-  margin: 16px auto;
-  padding: 16px 20px;
+  margin: var(--space-4) auto;
+  padding: var(--space-4) 20px;
   background: var(--card);
   border-radius: var(--radius-card);
-  border: 1px solid rgba(23, 50, 31, 0.15);
+  border: var(--card-border);
+  box-shadow: var(--card-shadow);
 }
 .results-list-wrap h2 {
   font-family: var(--font-serif);
@@ -248,20 +265,22 @@ footer.site-footer {
   color: var(--muted);
   font-size: 12.5px;
   text-align: center;
-  padding: 22px 16px 30px;
-  line-height: 1.6;
+  padding: var(--space-6) 16px 30px;
+  margin-top: var(--space-3);
+  line-height: 1.65;
   max-width: 640px;
+  border-top: 1px solid rgba(23, 50, 31, 0.1);
 }
 footer.site-footer .disclaimer {
   font-weight: 600;
   color: var(--ink);
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
 }
 footer.site-footer .facts {
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
 }
 .status-line {
-  margin-top: 10px;
+  margin-top: var(--space-3);
 }
 .status-dot {
   display: inline-block;
@@ -282,7 +301,7 @@ footer.site-footer .facts {
 /* Responsive breakpoints (URS-41) */
 @media (min-width: 720px) {
   header.site-header {
-    padding: 14px 12px 4px;
+    padding: var(--space-4) 12px var(--space-1);
   }
 }
 @media (max-width: 480px) {
@@ -295,5 +314,17 @@ footer.site-footer .facts {
   }
   .tooltip {
     font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .courts-toggle,
+  .court-pill,
+  .draw-toggle button {
+    transition: none !important;
+  }
+  .courts-toggle:hover,
+  .court-pill:hover {
+    transform: none;
   }
 }

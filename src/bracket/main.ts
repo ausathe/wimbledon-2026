@@ -11,8 +11,14 @@ import { CourtsController } from "./courts";
 import { LiveStore } from "../live/live-store";
 import { renderScoreboard, updateAgoStampAndPulse, type ScoreboardMount } from "../live/scoreboard";
 import { detectWins, createCelebrationController } from "../live/celebrate";
-import { assignRails, renderRails, type RailsMount } from "../live/rails";
-import type { LiveOverlay } from "../live/types";
+import {
+  assignRails,
+  renderRails,
+  filterMatchesForDraw,
+  filterOverlaysForDraw,
+  type RailsMount,
+} from "../live/rails";
+import type { LiveEngineState, LiveOverlay } from "../live/types";
 import { playerById } from "../data/players";
 
 import gentlemensRaw from "../data/gentlemens-singles.json";
@@ -241,6 +247,11 @@ if (drawToggleGroup) {
     }
     tooltip.hide();
     render();
+    // Re-filter the rails + "Live now" panel to the newly-selected draw
+    // immediately -- no network, no waiting for the next 15s poll (draw-scope
+    // requirement). Uses the LAST CACHED engine state; a no-op (both stay
+    // empty) until the first poll has landed.
+    renderLiveUIForCurrentDraw();
   });
 }
 
@@ -371,6 +382,7 @@ function spotlightNode(nodeNum: number, drawId: DrawId): void {
       b.setAttribute("aria-pressed", String(active));
     }
     render();
+    renderLiveUIForCurrentDraw(); // keep rails/panel scoped to the new draw (draw-scope requirement)
     // Wait a tick for the new draw's DOM to be in place before highlighting.
     window.setTimeout(applyHighlight, 0);
   } else {
@@ -413,18 +425,45 @@ const liveStore = new LiveStore({
   getModel: (id) => buildModel(DRAWS[id]),
 });
 
+/* Last engine state received from a poll (both draws, unfiltered) -- cached
+ * so the draw-toggle handler can immediately re-filter+re-render the rails
+ * and "Live now" panel without waiting for the next 15s poll (draw-scope
+ * requirement). Null until the first poll lands. */
+let lastLiveState: LiveEngineState | null = null;
+
+/** Render the rails + "Live now" panel scoped to `currentDrawId`, from
+ * `lastLiveState` (no network). Both views are filtered through the SAME
+ * `filterMatchesForDraw`/`filterOverlaysForDraw` helpers (src/live/rails.ts)
+ * so they can never disagree about which live matches belong to the
+ * currently-selected draw. Win-celebration detection is DELIBERATELY not
+ * called from here -- it only ever runs once per poll on the UNFILTERED
+ * state in the subscriber below (celebrations fire for either tour
+ * regardless of which draw is on screen, by design). */
+function renderLiveUIForCurrentDraw(): void {
+  if (!lastLiveState) return;
+  const drawMatches = filterMatchesForDraw(lastLiveState.matches, currentDrawId);
+  const drawOverlays = filterOverlaysForDraw(lastLiveState.overlays, currentDrawId);
+  if (scoreboardMount) {
+    renderScoreboard({ ...lastLiveState, matches: drawMatches }, scoreboardMount);
+  }
+  if (railsMount) {
+    const assignment = assignRails(drawMatches, drawOverlays, DRAWS);
+    renderRails(assignment, railsMount);
+  }
+}
+
 liveStore.subscribe((state, event) => {
   if (event === "poll") {
+    lastLiveState = state;
     overlaysByDraw = state.overlays;
     render(); // re-render the bracket WITH the overlay for currentDrawId (URS-88)
-    if (scoreboardMount) renderScoreboard(state, scoreboardMount);
-    if (railsMount) {
-      const assignment = assignRails(state.matches, state.overlays, DRAWS);
-      renderRails(assignment, railsMount);
-    }
-    // B.1: detect real in->post transitions from THIS poll's matches and
-    // queue a celebration for each (URS-107). No-ops gracefully if the
-    // celebration mount is missing (URS-114).
+    renderLiveUIForCurrentDraw();
+    // B.1: detect real in->post transitions from THIS poll's FULL (both-draw)
+    // matches and queue a celebration for each (URS-107) -- deliberately
+    // UNFILTERED so a win in either draw celebrates regardless of which draw
+    // is currently selected (explicit product decision, do not scope this to
+    // currentDrawId). No-ops gracefully if the celebration mount is missing
+    // (URS-114).
     for (const win of detectWins(state.matches)) celebration.enqueue(win);
 
     liveStatusText = state.ok

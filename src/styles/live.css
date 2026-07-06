@@ -7,10 +7,11 @@
 
 .live-scoreboard {
   width: min(94vw, 920px);
-  margin: 14px auto 0;
+  margin: var(--space-4) auto 0;
   background: var(--card);
-  border: 1px solid rgba(23, 50, 31, 0.15);
+  border: var(--card-border);
   border-radius: var(--radius-card);
+  box-shadow: var(--card-shadow-sm);
   overflow: hidden;
 }
 
@@ -18,11 +19,15 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 18px;
+  padding: 13px 18px;
   cursor: pointer;
   font: 700 15px/1.2 var(--font-serif);
   color: var(--ink);
   list-style: none;
+  transition: background 0.15s ease;
+}
+.live-summary:hover {
+  background: rgba(23, 50, 31, 0.03);
 }
 .live-summary::-webkit-details-marker {
   display: none;
@@ -118,8 +123,9 @@ details[open] > .live-summary::before {
   width: 100%;
   border-collapse: collapse;
   background: var(--bg);
-  border: 1px solid rgba(23, 50, 31, 0.12);
-  border-radius: 10px;
+  border: var(--card-border);
+  border-radius: var(--radius-card-sm);
+  box-shadow: var(--card-shadow-sm);
   overflow: hidden;
   font: 13px/1.3 var(--font-sans);
 }
@@ -169,7 +175,7 @@ details[open] > .live-summary::before {
 .ls-card thead tr:nth-child(2) th {
   font-size: 10.5px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.7px;
   color: var(--muted);
   font-weight: 700;
   border-bottom: 1px solid rgba(23, 50, 31, 0.12);
@@ -265,6 +271,13 @@ tr.ls-loser td:not(.ls-name-col) {
   .ls-live-dot {
     animation: none;
   }
+  .rail-card,
+  .live-summary {
+    transition: none !important;
+  }
+  .rail-card[data-node-num]:hover {
+    transform: none;
+  }
 }
 
 /* ============================================================================
@@ -338,9 +351,9 @@ tr.ls-loser td:not(.ls-name-col) {
   pointer-events: auto;
   width: 100%;
   background: var(--card);
-  border: 1px solid rgba(23, 50, 31, 0.15);
+  border: var(--card-border);
   border-radius: var(--radius-card);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--card-shadow-lg);
   padding: 14px 34px 14px 16px;
   overflow: hidden;
   animation: celPop 0.5s cubic-bezier(0.2, 1.5, 0.4, 1);
@@ -510,23 +523,36 @@ tr.ls-loser td:not(.ls-name-col) {
    Sticky + internally-scrolling so overflow never pushes the footer or
    overlaps the bracket (URS-123). Gutter reserved on wide screens so an
    idle->live transition doesn't shove the bracket sideways (URS-124).
+
+   Rail sizing: fixed content-width columns (NOT flex-grow) pinned snugly to
+   the stage's own edge -- on very wide viewports the leftover space falls to
+   the outer page margins (via #stage-row's own centering), not into a gap
+   between the rail and the circle. This keeps the live-score cards visually
+   "attached" to the bracket at every width from 1180px up to ultra-wide.
 ============================================================================ */
 #stage-row {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  gap: 18px;
+  gap: clamp(10px, 1.6vw, 22px);
   width: 100%;
+  padding: 0 12px;
 }
 #stage-row > #stage-wrap {
   order: 2;
   flex: 0 0 auto;
+  /* Kill #stage-wrap's own `margin: 10px auto` side-autos here: inside this
+     flex row, auto inline-margins would absorb ALL free space and shove the
+     rails out to the viewport edges on ultra-wide screens. Zeroing them lets
+     #stage-row's `justify-content: center` send the leftover to the outer
+     page margins instead, so the rails stay snug to the circle at any width. */
+  margin-inline: 0;
 }
 .rail {
   order: 1;
   flex: 1 1 260px;
-  max-width: 300px;
-  min-width: 240px;
+  max-width: 260px;
+  min-width: 220px;
   display: none; /* shown via media query on wide screens; JS also toggles per-side empty state */
   flex-direction: column;
   gap: 10px;
@@ -534,21 +560,37 @@ tr.ls-loser td:not(.ls-name-col) {
   top: 16px;
   max-height: calc(100vh - 32px);
   overflow-y: auto;
-  padding: 2px 2px 2px 0;
+  padding: 2px 2px 2px 2px;
+}
+.rail-left {
+  align-items: stretch;
+  padding-right: 2px;
 }
 .rail-right {
   order: 3;
+  align-items: stretch;
+  padding-left: 2px;
 }
 .rail-card {
   flex: 0 0 auto;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 .rail-card[data-node-num] {
   cursor: pointer;
+  border-radius: var(--radius-card-sm);
+}
+.rail-card[data-node-num]:hover {
+  transform: translateY(-1px);
+}
+.rail-card[data-node-num]:hover .ls-card {
+  box-shadow: var(--card-shadow);
 }
 .rail-card[data-node-num]:focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
-  border-radius: 10px;
+  border-radius: var(--radius-card-sm);
 }
 .rail-empty {
   margin: 0;
@@ -559,7 +601,7 @@ tr.ls-loser td:not(.ls-name-col) {
 .rail-unplaced-heading {
   font: 700 10.5px/1 var(--font-sans);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.7px;
   color: var(--muted);
   margin-top: 4px;
   padding-top: 8px;

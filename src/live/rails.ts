@@ -11,6 +11,37 @@ import { buildGeometry } from "../bracket/layout";
 import { renderCard } from "./scoreboard";
 import type { LiveMatch, LiveOverlay } from "./types";
 
+/** Scope a poll's full (both-draw) LiveMatch[] down to ONE draw, by
+ * `drawKind` (URS-131-ish: draw-scoped rails/panel). Shared by main.ts for
+ * BOTH the rails (`assignRails`) and the "Live now" panel (`renderScoreboard`)
+ * so the two views can never disagree about which matches belong to the
+ * currently-selected draw. Pure/total: an empty/mismatched `drawId` just
+ * yields an empty array, never throws. Does NOT affect win-celebration
+ * detection (`detectWins`), which is deliberately called with the
+ * UNFILTERED `state.matches` so it keeps firing for either tour regardless
+ * of which draw is on screen (explicit product decision -- see main.ts). */
+export function filterMatchesForDraw(matches: LiveMatch[], drawId: DrawId): LiveMatch[] {
+  return matches.filter((m) => m.drawKind === drawId);
+}
+
+/** Scope the full per-draw overlay map down to just the active draw, with the
+ * OTHER draw's slot zeroed out -- kept as a `Record<DrawId, LiveOverlay>` (not
+ * a bare `LiveOverlay`) because `assignRails`'s node reverse-lookup expects
+ * that shape. This is what prevents an unplaced match belonging to the other
+ * draw from leaking onto the active draw's rail (an unbound match has no
+ * overlay entry either way, but this keeps the two filters symmetric and the
+ * overlay argument honest about "what's visible right now"). */
+export function filterOverlaysForDraw(
+  overlaysByDraw: Record<DrawId, LiveOverlay>,
+  drawId: DrawId,
+): Record<DrawId, LiveOverlay> {
+  const result = {} as Record<DrawId, LiveOverlay>;
+  for (const id of Object.keys(overlaysByDraw) as DrawId[]) {
+    result[id] = id === drawId ? overlaysByDraw[id] : {};
+  }
+  return result;
+}
+
 export type RailSide = "left" | "right";
 
 export interface RailCard {

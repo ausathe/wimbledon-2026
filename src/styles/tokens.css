@@ -22,6 +22,23 @@
 
   --radius-pill: 999px;
   --radius-card: 14px;
+  --radius-card-sm: 10px;
+
+  /* Shared card language (visual-polish pass): one border/shadow vocabulary
+     reused across live-score cards, rail cards, tooltip, courts legend and
+     banners instead of ad-hoc one-off values per component. */
+  --card-border: 1px solid rgba(23, 50, 31, 0.12);
+  --card-shadow-sm: 0 1px 3px rgba(23, 50, 31, 0.08);
+  --card-shadow: 0 4px 16px rgba(23, 50, 31, 0.09);
+  --card-shadow-lg: 0 10px 30px rgba(23, 50, 31, 0.18);
+
+  /* Spacing scale (4px base) for consistent vertical rhythm between sections. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
 
   color-scheme: light;
 }
