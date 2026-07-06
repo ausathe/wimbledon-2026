@@ -256,7 +256,9 @@
               "_note": "MALFORMED (synthetic, not from live feed): only 1 competitor -- must be skipped without throwing (URS-83).",
               "id": "bad-1",
               "status": { "type": { "state": "in", "detail": "1st Set" } },
-              "competitors": [{ "id": "1", "athlete": { "displayName": "Solo Player" }, "linescores": [] }]
+              "competitors": [
+                { "id": "1", "athlete": { "displayName": "Solo Player" }, "linescores": [] }
+              ]
             },
             {
               "_note": "MALFORMED (synthetic): missing status entirely -- must be skipped.",
@@ -292,7 +294,11 @@
               "status": { "type": { "state": "post", "detail": "Final" } },
               "competitors": [
                 { "id": "1", "athlete": {}, "linescores": [{ "value": 6 }] },
-                { "id": "2", "athlete": { "displayName": "Has A Name" }, "linescores": [{ "value": 2 }] }
+                {
+                  "id": "2",
+                  "athlete": { "displayName": "Has A Name" },
+                  "linescores": [{ "value": 2 }]
+                }
               ]
             },
             {
@@ -331,8 +337,16 @@
               "id": "doubles-1",
               "status": { "type": { "state": "in", "detail": "1st Set" } },
               "competitors": [
-                { "id": "1", "athlete": { "displayName": "Doubles A" }, "linescores": [{ "value": 4 }] },
-                { "id": "2", "athlete": { "displayName": "Doubles B" }, "linescores": [{ "value": 3 }] }
+                {
+                  "id": "1",
+                  "athlete": { "displayName": "Doubles A" },
+                  "linescores": [{ "value": 4 }]
+                },
+                {
+                  "id": "2",
+                  "athlete": { "displayName": "Doubles B" },
+                  "linescores": [{ "value": 3 }]
+                }
               ]
             }
           ]

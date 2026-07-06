@@ -189,10 +189,9 @@ export function matchLiveToNodes(
       currentSetIndex: m.currentSetIndex,
       detail: m.detail,
       court: m.court,
-      winnerPlayerId:
-        winnerSide === 0 ? idA : winnerSide === 1 ? idB : undefined,
-      servingPlayerId:
-        servingSide === 0 ? idA : servingSide === 1 ? idB : undefined,
+      winnerPlayerId: winnerSide === 0 ? idA : winnerSide === 1 ? idB : undefined,
+      servingPlayerId: servingSide === 0 ? idA : servingSide === 1 ? idB : undefined,
+      matchId: m.id,
     };
     overlay[nodeNum] = data;
   }

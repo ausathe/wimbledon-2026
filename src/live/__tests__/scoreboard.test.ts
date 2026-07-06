@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { renderScoreboard, updateAgoStampAndPulse, resetScoreboardDiffState, type ScoreboardMount } from "../scoreboard";
+import {
+  renderScoreboard,
+  updateAgoStampAndPulse,
+  resetScoreboardDiffState,
+  type ScoreboardMount,
+} from "../scoreboard";
 import type { LiveEngineState, LiveMatch } from "../types";
 
 /* JSDOM-free DOM shim: these tests only need element-like objects with the
@@ -89,10 +94,14 @@ describe("renderScoreboard (URS-90, URS-99, URS-100)", () => {
 
   it("sorts 'in' matches before today's 'post' matches (URS-100, CQ-A3)", () => {
     const mount = makeMount();
-    const post = makeMatch({ id: "post1", state: "post", players: [
-      { displayName: "Winner Guy", normalizedKey: "winner guy", winner: true },
-      { displayName: "Loser Guy", normalizedKey: "loser guy", winner: false },
-    ] });
+    const post = makeMatch({
+      id: "post1",
+      state: "post",
+      players: [
+        { displayName: "Winner Guy", normalizedKey: "winner guy", winner: true },
+        { displayName: "Loser Guy", normalizedKey: "loser guy", winner: false },
+      ],
+    });
     const live = makeMatch({ id: "live1" });
     renderScoreboard(baseState({ matches: [post, live] }), mount);
     const html = mount.cardsEl.innerHTML;

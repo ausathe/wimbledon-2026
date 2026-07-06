@@ -23,11 +23,13 @@ circular World Cup bracket).
 ## 2. Stack decision + rationale
 
 ### 2.1 Chosen stack
+
 **Astro (static output) + TypeScript, with the bracket as a single self-contained client
 `<script>` / vanilla TS module. Styling via scoped CSS + CSS custom properties (design tokens).
 No UI framework runtime shipped. Deployed static to GitHub Pages via GitHub Actions.**
 
 ### 2.2 Why (against the studio stack table)
+
 - The studio table maps **"Marketing / content / interactive-island static site"** → **Astro**,
   and this is exactly that: one content-heavy static page with a single rich interactive island
   (the bracket). Astro ships **near-zero JS** by default (URS-53, URS-52) and produces a pure
@@ -46,6 +48,7 @@ No UI framework runtime shipped. Deployed static to GitHub Pages via GitHub Acti
   small and custom; we build accessible controls directly (URS-47).
 
 ### 2.3 Acceptable alternative (if Astro proves friction)
+
 A **single hand-authored `index.html` + `main.ts` bundled with Vite** (or even no bundler,
 mirroring the reference 1:1) is an acceptable fallback that still satisfies every URS. If the
 developer finds Astro's island model adds ceremony without payoff for a single-page app, they
@@ -111,39 +114,45 @@ matching the reference.
 ## 5. Data model (types.ts)
 
 ```ts
-type Tier = "roofed" | "open";                 // court tier for tint (URS-18)
-interface Court { id: string; name: string; tier: Tier; capacity?: number; }
+type Tier = "roofed" | "open"; // court tier for tint (URS-18)
+interface Court {
+  id: string;
+  name: string;
+  tier: Tier;
+  capacity?: number;
+}
 
 interface Player {
-  id: string;            // stable key used in the draw JSON
-  name: string;          // "Carlos Alcaraz"
-  iso: string;           // "es"  -> flagcdn (URS-20)
-  shortCode: string;     // "ALC" -> feeder labels & token badge (URS-9,21)
-  seed?: number;         // 1..32 where seeded (URS-22)
+  id: string; // stable key used in the draw JSON
+  name: string; // "Carlos Alcaraz"
+  iso: string; // "es"  -> flagcdn (URS-20)
+  shortCode: string; // "ALC" -> feeder labels & token badge (URS-9,21)
+  seed?: number; // 1..32 where seeded (URS-22)
 }
 
 // A tennis set score, e.g. [[6,4],[3,6],[7,6]] with optional tiebreak detail.
 type SetScore = { games: [number, number]; tb?: number }[];
 
 interface Match {
-  num: number;                       // node id in the skeleton
-  p1?: string; p2?: string;          // player ids for leaf matches (outer ring)
-  score?: SetScore;                  // present => played (URS-24 tennis scores)
-  winner?: string;                   // OPTIONAL override; normally derived from score
-  courtId?: string;                  // -> Court (URS-19)
-  date?: string;                     // "2026-07-01"
-  time?: string;                     // "13:00 UTC+1" or "" (order-of-play, may be absent)
+  num: number; // node id in the skeleton
+  p1?: string;
+  p2?: string; // player ids for leaf matches (outer ring)
+  score?: SetScore; // present => played (URS-24 tennis scores)
+  winner?: string; // OPTIONAL override; normally derived from score
+  courtId?: string; // -> Court (URS-19)
+  date?: string; // "2026-07-01"
+  time?: string; // "13:00 UTC+1" or "" (order-of-play, may be absent)
 }
 
 interface Draw {
   id: "gentlemens-singles" | "ladies-singles";
-  label: string;                     // "Gentlemen's Singles"
-  bestOf: 3 | 5;                     // format (URS-68)
-  rootNum: number;                   // Final node id
-  children: Record<number,[number,number]>;  // skeleton (URS-3)
-  matches: Match[];                  // sparse: leaves carry players, all carry court/schedule
-  placeholder: boolean;              // true for 2026 illustrative data (URS-40)
-  updatedAt?: string;                // dataset timestamp for the status line (URS-30)
+  label: string; // "Gentlemen's Singles"
+  bestOf: 3 | 5; // format (URS-68)
+  rootNum: number; // Final node id
+  children: Record<number, [number, number]>; // skeleton (URS-3)
+  matches: Match[]; // sparse: leaves carry players, all carry court/schedule
+  placeholder: boolean; // true for 2026 illustrative data (URS-40)
+  updatedAt?: string; // dataset timestamp for the status line (URS-30)
 }
 ```
 
@@ -160,6 +169,7 @@ replaces the reference's football `winnerIndex` (goal comparison).
 ## 6. Geometry (layout.ts) — reuse the reference's math, adapted
 
 The reference's polar layout is directly reusable and should be ported, not reinvented:
+
 - Rings by level: level 0 = outer tokens, increasing inward to the Final at centre. For the
   **default R32 scope (URS-10)** there are 5 match levels (R32→R16→QF→SF→F) + level-0 tokens,
   i.e. the same ring count as the reference. Radii per level configurable (`RADIUS` map).
@@ -167,7 +177,7 @@ The reference's polar layout is directly reusable and should be ported, not rein
   first 16, right = last 16, matching the reference's `dfsFlags`/`flagAngle`.
 - Match angle = mean of children angles (memoised), same as reference `angleOf`.
 - Connectors = quadratic curve through the parent point (`connectorPath`), tokens = `pt(radius,
-  angle)` on `viewBox 0 0 1000 1000`.
+angle)` on `viewBox 0 0 1000 1000`.
 - **Court capsules** = the reference's "stadium crescent": a thick round-capped arc along the
   child ring between a match's two participants, `pointer-events:stroke` as the tooltip hitbox
   (URS-14, URS-15). Port `capsulePath` + `CAP_W`.
@@ -181,20 +191,21 @@ pinch-zoom via `documentElement.client*`) — URS-36, URS-43.
 
 ## 7. Rendering & interactions (map each to the reference)
 
-| Reference behaviour | Port to | URS |
-|---|---|---|
-| SVG lines/dots/trophy + HTML circular flags overlay | `render.ts` | URS-1,4,20 |
-| Champion at centre (gold ring, larger) / trophy when undecided | `render.ts` | URS-5 |
-| Eliminated grey / winner gold ring | `render.ts` | URS-26 |
-| Pop animation on newly-advanced winners (diff vs prev) | `render.ts` | URS-27 |
-| Custom tooltip, hover + tap, pinch-safe, viewport-clamped | `tooltip.ts` | URS-23,24,43,44 |
-| Feeder-code label for undecided side (`ALC/DJO`) | `model.ts`/`render.ts` | URS-9 |
-| soon/deck/live status from viewer clock | `status.ts` | URS-25 |
-| "Show venues" → "Show courts" toggle + legend + spotlight | `courts.ts` | URS-12…URS-18 |
-| ground/tint → court/tier tint | `courts.ts`,`data/courts.ts` | URS-18 |
-| status dot + "data updated" stamp | `main.ts` | URS-29,30 |
+| Reference behaviour                                            | Port to                      | URS             |
+| -------------------------------------------------------------- | ---------------------------- | --------------- |
+| SVG lines/dots/trophy + HTML circular flags overlay            | `render.ts`                  | URS-1,4,20      |
+| Champion at centre (gold ring, larger) / trophy when undecided | `render.ts`                  | URS-5           |
+| Eliminated grey / winner gold ring                             | `render.ts`                  | URS-26          |
+| Pop animation on newly-advanced winners (diff vs prev)         | `render.ts`                  | URS-27          |
+| Custom tooltip, hover + tap, pinch-safe, viewport-clamped      | `tooltip.ts`                 | URS-23,24,43,44 |
+| Feeder-code label for undecided side (`ALC/DJO`)               | `model.ts`/`render.ts`       | URS-9           |
+| soon/deck/live status from viewer clock                        | `status.ts`                  | URS-25          |
+| "Show venues" → "Show courts" toggle + legend + spotlight      | `courts.ts`                  | URS-12…URS-18   |
+| ground/tint → court/tier tint                                  | `courts.ts`,`data/courts.ts` | URS-18          |
+| status dot + "data updated" stamp                              | `main.ts`                    | URS-29,30       |
 
 **Tennis-specific changes from the reference (do NOT copy football verbatim):**
+
 1. **Scores** are tennis set scores, not `a–b` goals (URS-24). Tooltip renders e.g.
    `6–4, 3–6, 7–6(5), 6–2`.
 2. **Two players can share a nation** — flag alone is ambiguous. Add name (tooltip) + short
@@ -206,7 +217,7 @@ pinch-zoom via `documentElement.client*`) — URS-36, URS-43.
      a match may be `today` but not `live`/`deck`.
    - `deck` (on court next): within **~2h** before scheduled start.
    - `soon` (today): scheduled same calendar day (viewer local).
-   Only both-players-known + no-result matches highlight (URS-25).
+     Only both-players-known + no-result matches highlight (URS-25).
 4. **No third-place match** — omit the reference's match-103 special case entirely.
 5. **Two draws** (Gentlemen's / Ladies') via a toggle that re-runs buildModel+render (URS-2).
 6. **Palette** is Wimbledon green/purple/gold on ivory, not WC host-nation colours (URS-33).
@@ -232,6 +243,7 @@ gets an `aria-label` (URS-46); toggles expose `aria-pressed` (URS-47); tokens/`i
 --muted:   #6b7c70;
 --line:    #2a3a2f;   /* connector strokes */
 ```
+
 Verify every text/UI pairing against `--bg` for **AA** (URS-45) before shipping; adjust shades
 if any pairing fails (e.g. `--muted` on ivory). Title/headings: a refined serif (e.g. a
 system/Google serif like "Playfair Display" or "Source Serif"); UI/labels: a clean sans
@@ -246,7 +258,7 @@ a system serif stack to protect Lighthouse (URS-52).
   12,000), No.2 Court (open, 4,000), No.3 Court (open, 2,000), Court 12 (open), Court 18 (open).
 - **players.ts** — a plausible set of real, currently-relevant players with correct nationality
   ISO + short code, seeded 1..32. Seeds/draw are **illustrative** — mark the draw `placeholder:
-  true`. Do NOT present any result as a claimed real 2026 outcome (URS-69).
+true`. Do NOT present any result as a claimed real 2026 outcome (URS-69).
 - **Two draw JSONs** — internally-consistent R32 skeletons that resolve to a single champion,
   with some matches "played" (scores), some pending (dots), a few scheduled today/soon to
   exercise status cues, and court assignments spread across the six courts to exercise the
@@ -290,7 +302,7 @@ a system serif stack to protect Lighthouse (URS-52).
   chrome + mount the island. No business logic in `.astro` files.
 - **No console noise:** no `console.log` in committed code; `console.warn` only on genuine
   degraded-data paths (mirrors the reference). Zero errors is a release gate (URS-56).
-- **Comments:** explain the *why* for non-obvious geometry/viewport math (the reference is an
+- **Comments:** explain the _why_ for non-obvious geometry/viewport math (the reference is an
   excellent model for comment density — port its rationale where you port its code).
 - **Commits/PRs:** reference `URS-n` ids for what each change satisfies.
 

@@ -31,7 +31,12 @@ describe("renderBracket overlay merge hook (URS-85, URS-88, URS-89, URS-93)", ()
 
     expect(overlay[17]).toBeDefined(); // Sinner vs Mochizuki, live, R16
 
-    const withoutOverlay = renderBracket({ draw: gentlemensDraw, model, prevWinners: {}, nowMs: Date.now() });
+    const withoutOverlay = renderBracket({
+      draw: gentlemensDraw,
+      model,
+      prevWinners: {},
+      nowMs: Date.now(),
+    });
     const withOverlay = renderBracket({
       draw: gentlemensDraw,
       model,
@@ -68,10 +73,7 @@ describe("renderBracket overlay merge hook (URS-85, URS-88, URS-89, URS-93)", ()
     const overlay: LiveOverlay = {
       1: {
         state: "post",
-        sets: [
-          { games: [6, 3] },
-          { games: [6, 2] },
-        ],
+        sets: [{ games: [6, 3] }, { games: [6, 2] }],
         currentSetIndex: -1,
         detail: "Final",
         winnerPlayerId: "g-sinner",

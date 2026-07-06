@@ -106,4 +106,14 @@ describe("matchLiveToNodes (URS-86, URS-87, URS-88)", () => {
     expect(overlay).toEqual({});
     expect(unmatched).toEqual([]);
   });
+
+  it("stamps the overlay with the originating feed competition id (LIVE-SCORES-BLUEPRINT addendum B, matchId -- powers rails.ts's reverse lookup)", () => {
+    const model = buildModel(gentlemensDraw);
+    const adapted = espnToLiveMatches(atpFixture, "gentlemens-singles", "men");
+    const enriched = enrichMatches(adapted.matches);
+    const { overlay } = matchLiveToNodes(enriched, gentlemensDraw, model);
+    const node17 = overlay[17];
+    expect(node17?.matchId).toBeDefined();
+    expect(typeof node17?.matchId).toBe("string");
+  });
 });

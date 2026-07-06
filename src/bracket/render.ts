@@ -38,7 +38,10 @@ export interface EffectiveNode extends ResolvedNode {
   servingPlayerId?: string;
 }
 
-function effectiveNode(node: ResolvedNode | undefined, live: LiveNodeData | undefined): EffectiveNode | undefined {
+function effectiveNode(
+  node: ResolvedNode | undefined,
+  live: LiveNodeData | undefined,
+): EffectiveNode | undefined {
   if (!node) return undefined;
   if (!live || (live.state !== "in" && live.state !== "post")) {
     return { ...node, liveInProgress: false, hasLiveCoverage: false };
@@ -213,7 +216,8 @@ export function renderBracket(ctx: RenderContext): RenderResult {
         nextNum != null
           ? tipFor(draw, model, nextNum, maxLevel, overlay)
           : tipFor(draw, model, num, maxLevel, overlay);
-      const nextEffective = nextNum != null ? effectiveNode(model[nextNum], overlay?.[nextNum]) : undefined;
+      const nextEffective =
+        nextNum != null ? effectiveNode(model[nextNum], overlay?.[nextNum]) : undefined;
       const advanced = nextNum != null && nextEffective?.winner === w ? " win" : "";
       const status = nextEffective?.liveInProgress ? "live" : matchStatus(nextEffective, ctx.nowMs);
       const statusCls = status ? ` ${status}` : "";

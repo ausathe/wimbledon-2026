@@ -15,8 +15,16 @@
               "status": { "type": { "state": "in", "detail": "1st Set" } },
               "venue": { "court": "Centre Court" },
               "competitors": [
-                { "id": "1", "athlete": { "displayName": "Man Player One" }, "linescores": [{ "value": 3 }] },
-                { "id": "2", "athlete": { "displayName": "Man Player Two" }, "linescores": [{ "value": 2 }] }
+                {
+                  "id": "1",
+                  "athlete": { "displayName": "Man Player One" },
+                  "linescores": [{ "value": 3 }]
+                },
+                {
+                  "id": "2",
+                  "athlete": { "displayName": "Man Player Two" },
+                  "linescores": [{ "value": 2 }]
+                }
               ]
             }
           ]
@@ -30,8 +38,16 @@
               "status": { "type": { "state": "in", "detail": "1st Set" } },
               "venue": { "court": "No. 1 Court" },
               "competitors": [
-                { "id": "3", "athlete": { "displayName": "Woman Player One" }, "linescores": [{ "value": 4 }] },
-                { "id": "4", "athlete": { "displayName": "Woman Player Two" }, "linescores": [{ "value": 1 }] }
+                {
+                  "id": "3",
+                  "athlete": { "displayName": "Woman Player One" },
+                  "linescores": [{ "value": 4 }]
+                },
+                {
+                  "id": "4",
+                  "athlete": { "displayName": "Woman Player Two" },
+                  "linescores": [{ "value": 1 }]
+                }
               ]
             }
           ]

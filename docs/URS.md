@@ -9,6 +9,7 @@
 ## 0. Preamble
 
 ### 0.1 What this is
+
 A single-page, static, client-side web app that renders the **Gentlemen's and Ladies'
 Singles knockout draws of The Championships, Wimbledon 2026** as an interactive **circular
 radial bracket**, modelled closely on the reference fan site
@@ -18,23 +19,26 @@ custom score tooltips, live/soon status cues, diff-animated re-render) translate
 football groups/stadiums/national-teams to tennis **draw / courts / seeded players**.
 
 ### 0.2 Concept translation (reference → this build)
-| World Cup reference | Wimbledon 2026 equivalent |
-|---|---|
-| 32-team knockout, Round of 32 → Final | 128-player singles draw. **Reference renders the last 32 (Round of 4 / "R32" = the round of 32 players).** See §1.4 for the draw-scope decision. |
-| National team flags (flagcdn) | Player **country flags** (flagcdn) as the primary token; optional player avatar/initials |
-| Group stage → knockout | Seeding + draw sections (top/bottom halves, quarters) |
-| Stadiums (16 host venues, 3 nations) | **Show courts** (Centre Court, No.1, No.2, No.3, Court 12, Court 18) |
-| Host-nation tint (MX/US/CA) | Court-tier tint (roofed show court / open show court) |
-| Third-place play-off (outside the tree) | Not applicable — omit (no third-place match at Wimbledon) |
-| Two host nations' colours | Wimbledon **green + purple** brand palette |
-| "Trophy" glyph at centre | Wimbledon trophy glyph (Gentlemen's cup / Ladies' Venus Rosewater dish) |
+
+| World Cup reference                     | Wimbledon 2026 equivalent                                                                                                                        |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 32-team knockout, Round of 32 → Final   | 128-player singles draw. **Reference renders the last 32 (Round of 4 / "R32" = the round of 32 players).** See §1.4 for the draw-scope decision. |
+| National team flags (flagcdn)           | Player **country flags** (flagcdn) as the primary token; optional player avatar/initials                                                         |
+| Group stage → knockout                  | Seeding + draw sections (top/bottom halves, quarters)                                                                                            |
+| Stadiums (16 host venues, 3 nations)    | **Show courts** (Centre Court, No.1, No.2, No.3, Court 12, Court 18)                                                                             |
+| Host-nation tint (MX/US/CA)             | Court-tier tint (roofed show court / open show court)                                                                                            |
+| Third-place play-off (outside the tree) | Not applicable — omit (no third-place match at Wimbledon)                                                                                        |
+| Two host nations' colours               | Wimbledon **green + purple** brand palette                                                                                                       |
+| "Trophy" glyph at centre                | Wimbledon trophy glyph (Gentlemen's cup / Ladies' Venus Rosewater dish)                                                                          |
 
 ### 0.3 Legal / branding constraint (binding)
+
 This is an **unofficial, fan-made** project. It MUST NOT imply official affiliation with,
 endorsement by, or licensing from The All England Lawn Tennis Club (AELTC), Wimbledon, the
 ATP, the WTA, or the ITF. See URS-70…URS-73.
 
 ### 0.4 Data-availability note
+
 As of the spec date, the 2026 singles **draw, seeds, order of play, and results are not
 final/published in a stable machine-readable feed**. Unlike the reference (which consumes a
 live openfootball JSON feed), this build ships with a **local, versioned placeholder dataset**
@@ -43,6 +47,7 @@ the UI (URS-40) and be swappable without code changes (URS-31). Stable facts (ve
 dates, format, edition = 139th) are used as real data.
 
 ### 0.5 How to read this document
+
 Requirements are atomic and testable. Each has an id `URS-n`. "MUST" = mandatory, "SHOULD" =
 strongly preferred (failure requires design sign-off), "MAY" = optional. The test-agent
 verifies every MUST and SHOULD by id.
@@ -89,8 +94,10 @@ verifies every MUST and SHOULD by id.
   (e.g. `ALC/DJO`), mirroring the reference's `PAR/FRA` behaviour. Otherwise it reads `TBD`.
 
 ### 1.4 Draw-scope decision (defaulted, flagged for client)
+
 The reference renders a **32-slot** radial bracket. A full 128-draw radial bracket has 128
 outer tokens, which is legible on desktop but cramped on mobile.
+
 - **URS-10 (DEFAULT)** The build MUST render the **Round of 32 onward** as the default,
   primary radial bracket (32 outer tokens → Final), directly matching the reference's density
   and legibility. This is the shipped default unless the client chooses otherwise (see
@@ -167,9 +174,9 @@ outer tokens, which is legible on desktop but cramped on mobile.
     pulsing green/purple halo + a "Live" tooltip state.
   - `on court next` (deck) — imminent (within a short window before scheduled start).
   - `today` (soon) — scheduled today (wider window).
-  Only matches with both participants known and no result yet may be highlighted. Tennis
-  matches are long and often lack exact start times (follow-on order of play); the live/soon
-  windows MUST be tuned for tennis, not football (see BUILD-BLUEPRINT for defaults).
+    Only matches with both participants known and no result yet may be highlighted. Tennis
+    matches are long and often lack exact start times (follow-on order of play); the live/soon
+    windows MUST be tuned for tennis, not football (see BUILD-BLUEPRINT for defaults).
 
 - **URS-26** A completed match token that LOST MUST be visually de-emphasised (greyscale/dim),
   and the WINNER token highlighted, matching the reference's eliminated/win treatment.
@@ -388,24 +395,24 @@ outer tokens, which is legible on desktop but cramped on mobile.
 
 - **CQ-1 (draw scope):** Ship the **Round-of-32 radial bracket** (matches the reference's
   density, cleanest on mobile) as default — or attempt the **full 128 draw** radial view
-  (impressive on desktop, needs pan/zoom on mobile)? *Default assumed: R32.*
+  (impressive on desktop, needs pan/zoom on mobile)? _Default assumed: R32._
 - **CQ-2 (draws shown):** Both **Gentlemen's & Ladies' Singles** (assumed). Also want
-  **Doubles** draws? *Default: singles only for v1.*
+  **Doubles** draws? _Default: singles only for v1._
 - **CQ-3 (tokens):** Flags + names/initials only (assumed, avoids photo rights) — or player
-  **photos/avatars** (needs sourcing/licensing)? *Default: flags + names, no photos.*
+  **photos/avatars** (needs sourcing/licensing)? _Default: flags + names, no photos._
 - **CQ-4 (data realism):** Ship an **illustrative placeholder** draw/results clearly marked as
   such (assumed) — or wait to populate with the **real** 2026 draw/seeds once published?
-  *Default: labelled placeholder now, swappable later.*
+  _Default: labelled placeholder now, swappable later._
 - **CQ-5 (title/wordmark):** Preferred site title given the unofficial constraint — e.g.
-  "Wimbledon 2026 — Unofficial Bracket" vs "The Championships 2026 (fan)"? *Default: a title
-  that reads clearly as unofficial.*
+  "Wimbledon 2026 — Unofficial Bracket" vs "The Championships 2026 (fan)"? _Default: a title
+  that reads clearly as unofficial._
 
 ---
 
 # Feature addendum A — Live scores (URS-78…URS-104)
 
 **Status:** Draft for build (v1) — appended 2026-07-05 by design-agent.
-**Scope:** a *major feature* layered onto the existing, shipped bracket. URS-1…URS-77 remain in
+**Scope:** a _major feature_ layered onto the existing, shipped bracket. URS-1…URS-77 remain in
 force and unchanged. This addendum adds live-score fetching, a live scoreboard UI, live-driven
 status, and the degradation contract. Everything below is verified against a REAL data source
 (see §A.0); the developer MUST NOT assume feed capabilities beyond what is listed.
@@ -428,7 +435,7 @@ status, and the degradation contract. Everything below is verified against a REA
 - **What the feed HONESTLY provides:** set-by-set game scores incl. tiebreak point counts, a
   current-set indicator, server, match state, round/detail text, and (best-effort) court —
   updating live.
-- **What the feed does NOT reliably provide:** the live *game* point score (0/15/30/40/deuce/adv).
+- **What the feed does NOT reliably provide:** the live _game_ point score (0/15/30/40/deuce/adv).
   The point-by-point summary endpoint is not openly accessible. **This feature MUST NOT claim or
   imply a live point ticker.** If point data happens to appear in a payload, it MAY be shown as
   clearly best-effort, never as a required/guaranteed field.
@@ -473,7 +480,7 @@ status, and the degradation contract. Everything below is verified against a REA
   with optional tiebreak point counts, which set is current, who is serving (if given), match
   state (`in` | `post` | `pre`), round/detail text, court (if given), and a `winner` side (if
   given). The adapter MUST reuse the existing `SetGames` / `SetScore` shape (`{ games:[a,b],
-  tb?:[a,b]|number }`) for the set grid so the bracket's existing `formatScore` and scoring logic
+tb?:[a,b]|number }`) for the set grid so the bracket's existing `formatScore` and scoring logic
   stay the single source of truth for score formatting (URS-24). The ESPN `linescores[i].value`
   pairs across the two competitors form each set's `games` tuple; `tiebreak` populates `tb`;
   `winner` on a competitor's final set / `status` populates the winner side.
@@ -584,7 +591,7 @@ status, and the degradation contract. Everything below is verified against a REA
 
 - **URS-101** The live status line (the existing footer status dot, URS-29) MUST reflect live
   state honestly: e.g. "Live · updated Xs ago" on success, "Live feed unavailable — showing saved
-  snapshot" on failure. It MUST distinguish *live feed* state from the local dataset's own
+  snapshot" on failure. It MUST distinguish _live feed_ state from the local dataset's own
   `updatedAt` stamp (URS-30) without conflating them.
 
 - **URS-102** Repeated poll failures MUST NOT escalate resource use: on consecutive failures the
@@ -642,13 +649,286 @@ status, and the degradation contract. Everything below is verified against a REA
 
 - **CQ-A1 (scoreboard placement):** Default = a collapsible **"Live now" panel above the bracket**
   (side rail on wide screens). Alternative = a persistent **side rail beside the bracket** on
-  desktop only, or **tooltip-only** (no separate panel). *Default assumed: panel above / rail
-  beside.*
+  desktop only, or **tooltip-only** (no separate panel). _Default assumed: panel above / rail
+  beside._
 - **CQ-A2 (drive bracket tokens live vs panel-only):** Default = **both** — matched live matches
-  drive the bracket node's status/score/tooltip (URS-88/URS-89) *and* appear in the panel.
+  drive the bracket node's status/score/tooltip (URS-88/URS-89) _and_ appear in the panel.
   Alternative = **panel-only** (leave the bracket entirely on local snapshot data, show live only
   in the scoreboard). Driving the bracket live is the more impressive, coherent option and is the
   default; panel-only is simpler/safer if the client prefers the bracket to stay a stable snapshot.
-  *Default assumed: drive both.*
+  _Default assumed: drive both._
 - **CQ-A3 (recently-completed matches):** Default = the scoreboard shows `in` matches plus that
-  **day's** `post` results. Alternative = `in`-only. *Default assumed: include today's completed.*
+  **day's** `post` results. Alternative = `in`-only. _Default assumed: include today's completed._
+
+---
+
+# Feature addendum B — live UX upgrades (URS-107…URS-130)
+
+**Status:** Draft for build (v1) — appended 2026-07-06 by design-agent.
+**Scope:** three focused _upgrades_ to the existing, shipped live-scores feature (addendum A,
+URS-78…URS-106). This is NOT a redesign. URS-1…URS-106 remain in force and unchanged. Every
+upgrade below reuses the existing data engine (`src/live/live-store.ts` poll/tick, the ESPN
+adapter, the reconcile→overlay pipeline, the `layout.ts` polar geometry, and the `render.ts`
+`effectiveNode` merge hook). No new data source, no new poll cadence, no change to §A.0 feed
+capability. The three upgrades are:
+
+- **B.1 — Win celebration + announcement** (URS-107…URS-114): a one-shot celebratory moment when a
+  match finishes _while the site is open_.
+- **B.2 — Pulsating live-token borders** (URS-115…URS-119): an animated pulsing ring on bracket
+  tokens for `in` matches.
+- **B.3 — Persistent left/right active-match rails** (URS-120…URS-128): always-visible cards
+  flanking the bracket circle, one per live match, split left/right by ring angle.
+
+Shared definition-of-done for the addendum is URS-129; open client questions are URS-130 / Appendix
+B-live.
+
+### B.0 Shared constraints (bind all three upgrades)
+
+- **B.0.1** No upgrade may change the network cadence (`POLL_MS` = 15s) or the display tick
+  (`TICK_MS` = 1s), fetch a new endpoint, or claim data the feed does not provide (§A.0, URS-91).
+  All three read from the existing `LiveEngineState` the store already publishes.
+- **B.0.2** No upgrade may break the degradation contract (URS-98…URS-101): with the feed
+  unreachable, off-season, or non-Wimbledon, none of the three fire/animate/appear, and the
+  bracket + base experience (URS-1…URS-77) stay fully intact.
+- **B.0.3** All three MUST be on-brand (green/purple/gold on ivory, existing `tokens.css`, serif
+  headings / sans labels — URS-94) and MUST NOT introduce a new visual language.
+- **B.0.4** All new logic MUST live under `src/live/**` (plus `src/styles/live.css` and, if needed,
+  an Astro shell component). The base `src/bracket/**` stays clean except the ONE existing merge
+  hook already documented (URS-88, `effectiveNode` / the `.status-live` token class). B.2's pulse
+  is a CSS change keyed off the class the merge hook already emits — no new `src/bracket/**` logic.
+- **B.0.5** All three MUST respect `prefers-reduced-motion` per the fallbacks specified per-feature
+  (extends URS-38, URS-50). Zero new console errors, no memory/timer leaks, no layout thrash
+  (extends URS-56, URS-97, URS-104).
+
+---
+
+## B.1 — Win celebration + announcement (URS-107…URS-114)
+
+- **URS-107 (trigger — session-scoped, real transitions only)** The app MUST show a celebratory
+  on-screen moment ONLY when a match transitions from in-progress to finished **during the current
+  session** — i.e. a competition the live-store observed as `state==="in"` (or newly-appearing with
+  a winner) on one poll becomes `state==="post"` with a decided winner on a **later** poll. The
+  trigger MUST be computed from the **existing live-store poll-to-poll diff** (the diff that already
+  detects real changes and writes the aria-live region), NOT the 1s display tick.
+  - **URS-107.1 (no historical replay)** Matches that are already `post` on the **first** poll of
+    the session (results that finished before the page was opened) MUST NOT fire a celebration. The
+    first poll only seeds the "seen state" baseline; celebrations fire on subsequent transitions.
+  - **URS-107.2 (fire exactly once — dedupe)** Each finished match MUST fire its celebration
+    **exactly once**, keyed by the stable feed competition id (`LiveMatch.id`). A match already
+    celebrated MUST NOT re-fire on a later poll even if it keeps re-appearing as `post` in the feed
+    for the rest of the day.
+  - **URS-107.3 (graceful / no feed)** If the feed is down, off-season, or non-Wimbledon, nothing
+    fires (no transition is observed) — consistent with URS-98/URS-99. A poll that fails MUST NOT
+    fabricate a completion.
+
+- **URS-108 (scope of celebrated matches)** The celebration MUST fire for any **singles** match the
+  feed reports finishing during the session (both draws), whether or not it maps to a bracket node.
+  When the match **maps to a bracket node** (reconcile resolves both players — URS-86), the
+  celebration MUST use the richer identity we hold (seed, nationality flag) and MAY offer the
+  "spotlight the node" affordance (URS-113). When it does **not** map to a node, the celebration
+  still fires using the feed display names only, with no flag/seed and no spotlight link. _(Default
+  chosen: celebrate all singles completions, richer for bracket-mapped ones. See URS-130 / CQ-B1
+  for the alternative "bracket-mapped only".)_
+
+- **URS-109 (content of the celebration)** Each celebration MUST announce the **winner by name**
+  (e.g. "Kostyuk wins!") and SHOULD include, where available from the feed/our model: the
+  **opponent** ("Kostyuk def. Świątek"), the **round / status detail** (`LiveMatch.detail`, e.g.
+  "Quarter-final"), and the **final set score** (reusing the existing `formatScore` / set-grid, no
+  new formatter — URS-84). Winner nationality flag + seed MUST be shown when the match maps to a
+  modelled player. Copy MUST stay honest (no point-by-point, no "official" framing — URS-91,
+  URS-105).
+
+- **URS-110 (visual treatment — on-brand celebratory moment)** The celebration MUST present as an
+  on-brand celebratory overlay: a **banner/toast card** (Wimbledon green/purple with gold accent,
+  reusing `tokens.css`) carrying the URS-109 content, plus a **celebratory animation** (e.g. a
+  gold/green/purple confetti burst or a radial "pop"/glow around the card — reusing the existing
+  "pop" transition vocabulary where practical). It MUST read clearly as a _win moment_, distinct
+  from the routine "score updated" aria announcement (URS-103) and from the LIVE pulse (B.2).
+
+- **URS-111 (non-blocking, dismiss, duration, queueing)**
+  - **URS-111.1** The celebration MUST NOT block interaction with the page: it MUST NOT be a modal
+    that traps focus or disables the bracket/rails/panel underneath. It is an overlay/toast, not a
+    dialog gate.
+  - **URS-111.2** It MUST **auto-dismiss** after a bounded duration (default **~6s**, a single named
+    constant e.g. `CELEBRATION_MS`) and MUST also offer a **manual dismiss** (a clearly labelled,
+    keyboard-focusable close control; Esc SHOULD dismiss the currently-shown celebration).
+  - **URS-111.3 (queueing)** If **multiple** matches finish in one poll (or a new one finishes while
+    one is still showing), celebrations MUST **queue** and play one at a time (or a small bounded
+    stack), each honouring its own duration — never overlapping into an unreadable pile, never
+    dropping a queued win silently. A sensible cap (e.g. show up to N, collapse the remainder into a
+    single "＋N more results" note) is acceptable and SHOULD be a named constant.
+
+- **URS-112 (accessibility)** The winner announcement MUST be conveyed to assistive tech via a
+  **polite** `aria-live` region (may reuse or parallel the existing scoreboard live region,
+  URS-103) with a concise message (e.g. "Kostyuk wins, def. Świątek 6–3, 7–5"). It MUST NOT be
+  `assertive`/interruptive, MUST NOT be spammy (one announcement per win, tied to URS-107.2 dedupe),
+  and MUST NOT be re-read on the 1s tick. The close control MUST be keyboard-operable with a visible
+  focus indicator and an accessible name.
+
+- **URS-113 (reduced-motion — MUST fully suppress animation)** Under
+  `prefers-reduced-motion: reduce`, the confetti/burst/pop animation MUST be **fully
+  suppressed** — no particle animation, no motion. A **non-animated banner card** MUST still appear
+  (static, same content, same auto/manual dismiss) so reduced-motion users still get the
+  announcement. The aria-live announcement (URS-112) is unaffected.
+
+- **URS-114 (does not fire on tick; graceful on missing DOM)** The celebration MUST fire only on the
+  poll-detected transition, never on the 1s tick (extends URS-95). If the celebration mount point is
+  absent from the DOM, the feature MUST no-op with a single dev `console.warn` and MUST NOT throw or
+  affect the bracket/panel/rails (extends URS-56).
+
+## B.2 — Pulsating live-token borders (URS-115…URS-119)
+
+- **URS-115 (what pulses, and only that)** Every bracket **token** (`.flag-wrap`) whose node the
+  overlay reports `state==="in"` (i.e. the token that already receives the live status cue via the
+  `effectiveNode` merge hook, URS-88/URS-89) MUST display a **continuously animated pulsing border
+  ring** signifying "live right now". The pulse MUST apply to `in` nodes **only** and MUST NOT
+  appear on `pre`, `post`, or clock-heuristic-only nodes (a node highlighted purely by the URS-25
+  `today`/`deck` window without live-feed `in` coverage does NOT get the animated pulse — it keeps
+  its existing static cue).
+
+- **URS-116 (distinct from existing cues, correct layering)** The pulsing ring MUST be visually
+  **distinct** from: (a) the existing _static_ live cue (URS-25 halo), (b) the **winner** gold ring
+  (URS-5/URS-26), and (c) the **eliminated** grey/dim treatment (URS-26). It MUST **layer cleanly**
+  with those states without conflict: a token cannot be simultaneously `in` and a decided
+  winner/loser, but the pulse ring MUST not fight the champion gold ring or the token's flag clip.
+  Specify ring **colour** (on-brand green or purple, AA-contrasting against ivory and against the
+  flag), **thickness**, and **animation cadence** (a slow, calm pulse ~1.2–2s period — not a
+  seizure-risk fast strobe) in BUILD/LIVE blueprint.
+
+- **URS-117 (clears correctly)** The pulse MUST **clear** the instant a node stops being `in`: when
+  the match goes `post` (the token then takes winner/eliminated styling), when live coverage is lost
+  (feed failure/degradation empties the overlay — URS-98), or when switching to a draw where that
+  node isn't live. No orphaned pulsing ring may persist after the underlying `in` state is gone.
+  Because the pulse is keyed off the class the existing merge hook emits, a re-render with an empty
+  overlay MUST remove it automatically.
+
+- **URS-118 (reduced-motion fallback)** Under `prefers-reduced-motion: reduce`, the pulse animation
+  MUST be replaced by a **static, distinct border** (e.g. a solid green/purple ring at the pulse's
+  mid-opacity) — no animation, but still a clear, colour-plus-shape "live" indicator so
+  reduced-motion users can still tell which matches are live (extends URS-51 colour-not-alone).
+
+- **URS-119 (performance)** The pulse MUST be a pure CSS animation on an already-present element
+  (border/box-shadow/`::before`/`::after` ring on `.flag-wrap`), animating only compositor-friendly
+  properties (opacity/transform/box-shadow), and MUST NOT cause layout reflow/thrash, re-trigger the
+  bracket re-render, or measurably regress the Lighthouse ≥90 bar even with many `in` tokens
+  (extends URS-97, URS-104). It MUST NOT run when no node is `in`.
+
+## B.3 — Persistent left/right active-match rails (URS-120…URS-128)
+
+- **URS-120 (persistent, always-visible rails on wide screens)** On wide/desktop viewports the app
+  MUST render a **constant, always-visible set of cards flanking the bracket circle** — one card per
+  **active (`in`)** match — split into a **left rail** and a **right rail** either side of the
+  bracket stage. The rails require **zero interaction**: a user MUST be able to see the whole draw
+  circle AND every ongoing match at a single glance. The rails are NOT collapsible on wide screens
+  (that is the point — always visible), unlike the existing "Live now" panel.
+
+- **URS-121 (left/right assignment by ring angle)** Each `in` match card MUST be placed on the rail
+  matching **where its match sits on the ring**, using the node's angular position from
+  `layout.ts` (`geo.angleOf(num)`): a node on the **right half** of the circle → **right rail**, a
+  node on the **left half** → **left rail**. (Convention: `layout.ts` places negative angles on the
+  left semicircle and non-negative on the right — see LIVE blueprint §11; use that sign as the
+  split.) Cards within a rail MUST be **ordered top-to-bottom by angle** (topmost node → top of the
+  rail) so a card's vertical position visually corresponds to its node's position on the ring.
+  - **URS-121.1 (unbound matches placement rule)** An `in` match that does **not** map to a bracket
+    node (unmatched name / player outside our R32 subset — URS-87) has no angle. It MUST have a
+    **defined placement**: default = a dedicated group appended **below the matched cards on the
+    right rail** (or a small "unplaced live matches" subsection), never dropped silently and never
+    forced onto an arbitrary node. This rule MUST be deterministic (stable ordering, e.g. by feed
+    id) so cards don't jump between polls.
+
+- **URS-122 (card content, kept in poll-sync)** Each rail card MUST show: both **players** (name;
+  seed + nationality flag when the match maps to a modelled player, reusing the flag token
+  treatment); the **live set/game score** (set-by-set grid reusing the scoreboard's existing card
+  renderer / `formatScore`, tiebreak superscripts); the **current set** highlighted; the **server**
+  indicator when the feed provides it; **round / court / status detail** (`LiveMatch.detail`,
+  court); and a clear **LIVE** badge. Cards MUST update on each successful poll (reusing the
+  card-level diff so only changed cards re-render — URS-97) and MUST NOT update/rebuild on the 1s
+  tick (the tick only refreshes the shared "updated Xs ago" stamp — URS-95).
+
+- **URS-123 (overflow behaviour)** When one rail has **more cards than fit** the viewport height,
+  the rail MUST handle overflow gracefully — default: the rail **scrolls internally**
+  (`overflow-y:auto` within a bounded height) so it never pushes the footer or overlaps the bracket;
+  a cap-plus-"＋N more" collapse is an acceptable alternative and MUST be a named constant if used.
+  The rails MUST NOT overlap the bracket stage or each other, and MUST preserve the centred vertical
+  rhythm (URS-35).
+
+- **URS-124 (empty state)** When there are **zero `in` matches** (feed idle, off-season, degraded),
+  the rails MUST be **hidden** (preferred — they occupy no space, bracket centres normally) OR
+  collapse to a slim, calm "no live matches" note. They MUST NEVER show an error or a pulsing
+  indicator when nothing is live (consistent with URS-100/URS-96). The transition idle→live→idle
+  MUST NOT cause a jarring layout jump of the bracket (reserve the rail gutters or animate gently).
+
+- **URS-125 (reconcile with the existing "Live now" panel — ONE UI per breakpoint, not two)** The
+  persistent rails and the existing collapsible "Live now" scoreboard panel (URS-92) MUST NOT both
+  be visible at the same time on the same viewport — no redundant duplicate live UI.
+  **Recommended (DEFAULT):** the **rails are the wide-screen form**, the **existing panel becomes
+  the narrow/mobile form**. On viewports wide enough to flank the circle (see URS-126 breakpoint),
+  show the rails and **hide** the "Live now" panel; below that breakpoint, hide the rails and show
+  the existing collapsible panel exactly as today. Both forms are driven by the **same**
+  `LiveEngineState` and the **same** card renderer — the difference is layout/placement only, not a
+  second data path or a second card component. The scoreboard's `post`/today's-results content and
+  the aria-live region continue to live with the panel (mobile) / a shared region; the rails show
+  **`in` matches only** (that is their purpose). _(See URS-130 / CQ-B2 for the alternative "rails
+  augment, panel stays for post results on desktop too".)_
+
+- **URS-126 (responsive — mobile treatment)** On narrow/mobile viewports the rails MUST NOT attempt
+  to flank the circle (there is no horizontal room). Below the flanking breakpoint (define in
+  blueprint, e.g. viewport width < ~1100–1200px where the square stage + two ≥240px rails no longer
+  fit), the app MUST fall back to the **existing stacked, collapsible "Live now" panel above the
+  bracket** (URS-92) — the current mobile behaviour, unchanged. The breakpoint MUST be chosen so the
+  bracket stage never gets crushed by the rails.
+
+- **URS-127 (accessibility)** Each rail MUST be a semantic region with an accessible name (e.g.
+  `aria-label="Live matches, left of draw"` / "…right of draw"). Cards MUST reuse the scoreboard's
+  accessible set-grid structure (real table semantics / row+col headers — URS-103), be
+  keyboard-reachable and screen-reader legible, and MUST NOT introduce a duplicate/competing
+  aria-live region (score-change announcements stay single-sourced — URS-103/URS-112). Colour MUST
+  NOT be the only status signal (LIVE label + badge, not colour alone — URS-51).
+
+- **URS-128 (optional — click-to-spotlight, nice-to-have)** A rail card MAY be clickable to
+  **spotlight / scroll to its bracket node** (reusing the existing courts-spotlight fade vocabulary
+  or a brief highlight on the target `.flag-wrap`), when the card maps to a node. If implemented it
+  MUST be keyboard-operable and MUST NOT break if the card is unbound (no-op). This is explicitly
+  **optional** (MAY) — spec it only if cheap; not implementing it is not a defect.
+
+## B.4 — Definition of done — addendum B (test-agent GREEN for this addendum)
+
+- **URS-129** Every MUST in URS-107…URS-128 PASSES; every SHOULD PASSES or has written design
+  sign-off. Specifically verified:
+  1. **Celebration:** simulate a match going `in`→`post` on a subsequent poll (fixture-driven) →
+     exactly one on-brand celebration with winner (+opponent/round/score where available), auto- and
+     manually dismissable, queued when ≥2 finish together; **no** celebration for matches already
+     `post` at first poll; **no** fire on the 1s tick; a polite aria-live announcement; under
+     reduced-motion the confetti is gone but a static banner + announcement remain; feed-down fires
+     nothing.
+  2. **Pulse:** `in` tokens show a distinct animated pulsing ring; it clears on `post`/feed-loss/
+     draw-switch; it doesn't fight winner-gold/eliminated-grey; under reduced-motion it becomes a
+     static distinct border; no layout thrash, Lighthouse ≥90 holds with several `in` tokens.
+  3. **Rails:** on wide screens, one card per `in` match flanks the circle, correctly split
+     left/right by node angle and ordered top-to-bottom by angle; unbound live matches get their
+     defined placement; cards stay in poll-sync (diffed) and don't rebuild on the tick; overflow
+     scrolls within the rail without overlapping the bracket; empty state hides the rails calmly;
+     the "Live now" panel is hidden on wide screens and reappears (unchanged) on narrow; rails are
+     screen-reader legible with no duplicate aria-live; the optional spotlight (if built) is
+     keyboard-operable.
+  4. **Shared:** no new console errors, no timer/animation leaks, feed-down/off-season/non-Wimbledon
+     degrade all three to nothing, no network-cadence change, honesty labelling intact (URS-91,
+     URS-105).
+
+## Appendix B-live — Open clarifying questions (for the client, via orchestrator)
+
+- **CQ-B1 (celebration scope):** Default = celebrate **any singles match** the feed reports
+  finishing during the session (richer visuals for bracket-mapped ones — URS-108). Alternative =
+  fire **only for matches that map to our bracket nodes** (quieter; ignores wins by players outside
+  our R32 subset). _Default assumed: all singles completions._ **Recommendation: keep the default** —
+  a big-name upset finishing is exactly the moment worth celebrating even if that player isn't in
+  our 32-player placeholder subset; bracket-mapped just renders richer.
+- **CQ-B2 (rails vs panel reconciliation):** Default/recommended = **rails REPLACE the panel on
+  wide screens; the panel is the mobile form** (URS-125) — one live UI per breakpoint, no
+  duplication. Alternative = **rails augment**, and the panel _also_ stays on desktop to host
+  today's completed (`post`) results while the rails show only `in`. _Default assumed: rails replace
+  the panel on wide; panel is mobile-only._ **Recommendation: keep the default** (cleaner, no
+  redundant UI); if the client strongly wants desktop `post`-results visible without the rails, a
+  slim "today's results" strip under the bracket is a lighter add than resurrecting the full panel.
+- **CQ-B3 (rail card spotlight):** Should clicking a rail card **scroll to / spotlight its bracket
+  node** (URS-128)? _Default assumed: implement if cheap, otherwise skip — it's a MAY._

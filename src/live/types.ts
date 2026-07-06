@@ -57,6 +57,10 @@ export interface LiveNodeData {
   winnerPlayerId?: string;
   /** Resolved player id of the server, if the feed provided possession. */
   servingPlayerId?: string;
+  /** The originating feed competition id (LiveMatch.id) -- lets B.3's rails do
+   * an O(1) reverse lookup (matchId -> nodeNum/angle) without a second matcher
+   * (LIVE-SCORES-BLUEPRINT addendum B §3.2). */
+  matchId?: string;
 }
 
 /** nodeNum -> live data, for one draw. Empty object = no live coverage. */

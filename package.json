@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
+    "@types/node": "^26.1.0",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "axe-core": "^4.12.1",

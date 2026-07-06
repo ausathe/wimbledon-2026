@@ -13,7 +13,12 @@
               "id": "1",
               "date": "2026-07-06T13:00Z",
               "status": {
-                "type": { "id": "1", "name": "STATUS_SCHEDULED", "state": "pre", "detail": "Scheduled" }
+                "type": {
+                  "id": "1",
+                  "name": "STATUS_SCHEDULED",
+                  "state": "pre",
+                  "detail": "Scheduled"
+                }
               },
               "venue": { "court": "Centre Court" },
               "competitors": [

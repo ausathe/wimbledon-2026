@@ -13,8 +13,16 @@
               "id": "1",
               "status": { "type": { "state": "in", "detail": "1st Set" } },
               "competitors": [
-                { "id": "1", "athlete": { "displayName": "Player A" }, "linescores": [{ "value": 3 }] },
-                { "id": "2", "athlete": { "displayName": "Player B" }, "linescores": [{ "value": 2 }] }
+                {
+                  "id": "1",
+                  "athlete": { "displayName": "Player A" },
+                  "linescores": [{ "value": 3 }]
+                },
+                {
+                  "id": "2",
+                  "athlete": { "displayName": "Player B" },
+                  "linescores": [{ "value": 2 }]
+                }
               ]
             }
           ]

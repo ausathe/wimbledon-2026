@@ -2,6 +2,7 @@
 import Header from "../components/Header.astro";
 import CourtsControl from "../components/CourtsControl.astro";
 import LiveScoreboard from "../components/LiveScoreboard.astro";
+import LiveRails from "../components/LiveRails.astro";
 import Footer from "../components/Footer.astro";
 import "../styles/tokens.css";
 import "../styles/global.css";
@@ -47,12 +48,15 @@ const description =
     <Header />
     <main id="main-content">
       <LiveScoreboard />
-      <div
-        id="stage-wrap"
-        role="group"
-        aria-label="Wimbledon 2026 knockout bracket, Round of 32 through Final. Interactive: focus or hover a player token or court for match details."
-      >
-        <div id="stage"></div>
+      <div id="stage-row">
+        <LiveRails />
+        <div
+          id="stage-wrap"
+          role="group"
+          aria-label="Wimbledon 2026 knockout bracket, Round of 32 through Final. Interactive: focus or hover a player token or court for match details."
+        >
+          <div id="stage"></div>
+        </div>
       </div>
       <CourtsControl />
       <div class="results-list-wrap">
@@ -60,6 +64,7 @@ const description =
       </div>
     </main>
     <Footer />
+    <div id="celebration-root" aria-hidden="false"></div>
     <script src="../bracket/main.ts"></script>
   </body>
 </html>

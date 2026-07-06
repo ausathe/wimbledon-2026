@@ -134,7 +134,9 @@ describe("espnToLiveMatches (URS-81..84)", () => {
   });
 
   it("never throws on a grossly malformed root payload (URS-83, URS-98)", () => {
-    expect(() => espnToLiveMatches(malformedRootFixture, "gentlemens-singles", "men")).not.toThrow();
+    expect(() =>
+      espnToLiveMatches(malformedRootFixture, "gentlemens-singles", "men"),
+    ).not.toThrow();
     const result = espnToLiveMatches(malformedRootFixture, "gentlemens-singles", "men");
     expect(result.matches).toEqual([]);
     expect(result.isWimbledon).toBe(false);

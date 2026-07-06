@@ -10,7 +10,10 @@ import { Tooltip, type TipData } from "./tooltip";
 import { CourtsController } from "./courts";
 import { LiveStore } from "../live/live-store";
 import { renderScoreboard, updateAgoStampAndPulse, type ScoreboardMount } from "../live/scoreboard";
+import { detectWins, createCelebrationController } from "../live/celebrate";
+import { assignRails, renderRails, type RailsMount } from "../live/rails";
 import type { LiveOverlay } from "../live/types";
+import { playerById } from "../data/players";
 
 import gentlemensRaw from "../data/gentlemens-singles.json";
 import ladiesRaw from "../data/ladies-singles.json";
@@ -305,8 +308,105 @@ const scoreboardMount: ScoreboardMount | null =
     : null;
 
 if (!scoreboardMount) {
-  console.warn("live: scoreboard DOM mount points missing -- live panel disabled, bracket unaffected");
+  console.warn(
+    "live: scoreboard DOM mount points missing -- live panel disabled, bracket unaffected",
+  );
 }
+
+/* ============================================================================
+   Addendum B wiring (URS-107…URS-128, LIVE-SCORES-BLUEPRINT addendum B §B1.5,
+   §B3.4). Additive to the block above: all three upgrades read the SAME
+   `state` the existing poll subscriber already receives -- no second data
+   path, no new timers, no change to src/live/live-store.ts.
+============================================================================ */
+const railLeftEl = document.getElementById("rail-left");
+const railRightEl = document.getElementById("rail-right");
+const railsMount: RailsMount | null =
+  railLeftEl && railRightEl
+    ? { leftEl: railLeftEl, rightEl: railRightEl, leftWrapEl: railLeftEl, rightWrapEl: railRightEl }
+    : null;
+if (!railsMount) {
+  console.warn("live: rail DOM mount points missing -- rails disabled, bracket/panel unaffected");
+}
+
+/* B3.6 (optional, URS-128): click/keyboard "spotlight" a rail card's bracket
+ * node -- switches draw if needed, re-renders, then briefly highlights the
+ * matching token via the existing `.flag-wrap`'s own `data-teams` tooltip
+ * payload (already present on every token, no src/bracket/render.ts change
+ * needed) and scrolls it into view. No-op for unbound cards (no
+ * data-node-num on the card). */
+function spotlightNode(nodeNum: number, drawId: DrawId): void {
+  const applyHighlight = (): void => {
+    if (!stage) return;
+    const draw = DRAWS[drawId];
+    const model = buildModel(draw);
+    const node = model[nodeNum];
+    if (!node) return;
+    const [p1, p2] = node.participants;
+    if (!p1 && !p2) return;
+    for (const el of stage.querySelectorAll<HTMLElement>(".flag-wrap")) {
+      const teams = el.dataset.teams ?? "";
+      // The token's own tip payload names both participants of ITS match --
+      // for a leaf token that's the same pair as the node we're targeting, so
+      // matching the rendered `data-teams` string is a reliable, cheap way to
+      // find the right element(s) without a new node-number attribute.
+      const player1 = playerById(p1 ?? undefined)?.name;
+      const player2 = playerById(p2 ?? undefined)?.name;
+      const isMatch = (player1 && teams.includes(player1)) || (player2 && teams.includes(player2));
+      if (!isMatch) continue;
+      el.classList.remove("rail-spotlight");
+      // Force reflow so re-triggering the animation on a repeat click works.
+      void el.offsetWidth;
+      el.classList.add("rail-spotlight");
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      window.setTimeout(() => el.classList.remove("rail-spotlight"), 3000);
+    }
+  };
+
+  if (drawId !== currentDrawId) {
+    currentDrawId = drawId;
+    for (const b of document.querySelectorAll<HTMLButtonElement>("#draw-toggle [data-draw-id]")) {
+      const active = b.dataset.drawId === drawId;
+      b.classList.toggle("active", active);
+      b.setAttribute("aria-pressed", String(active));
+    }
+    render();
+    // Wait a tick for the new draw's DOM to be in place before highlighting.
+    window.setTimeout(applyHighlight, 0);
+  } else {
+    applyHighlight();
+  }
+}
+
+function wireRailSpotlight(container: HTMLElement | null): void {
+  if (!container) return;
+  const handler = (e: Event): void => {
+    const el = (e.target as HTMLElement).closest<HTMLElement>(".rail-card[data-node-num]");
+    if (!el) return;
+    if (e.type === "keydown") {
+      const key = (e as KeyboardEvent).key;
+      if (key !== "Enter" && key !== " ") return;
+      e.preventDefault();
+    }
+    const nodeNum = Number(el.dataset.nodeNum);
+    const drawId = el.dataset.drawId as DrawId | undefined;
+    if (Number.isNaN(nodeNum) || !drawId) return;
+    spotlightNode(nodeNum, drawId);
+  };
+  container.addEventListener("click", handler);
+  container.addEventListener("keydown", handler);
+}
+wireRailSpotlight(railLeftEl);
+wireRailSpotlight(railRightEl);
+
+const celebrationRootEl = document.getElementById("celebration-root");
+const celebration = createCelebrationController(celebrationRootEl, (text) => {
+  // Route through the SAME shared aria-live region the scoreboard panel uses
+  // (URS-112, URS-127) -- never a second live region. Only written on a real
+  // win, never on the tick.
+  if (liveRegionEl) liveRegionEl.textContent = text;
+});
+window.addEventListener("pagehide", () => celebration.destroy());
 
 const liveStore = new LiveStore({
   getDraw: (id) => DRAWS[id],
@@ -318,6 +418,15 @@ liveStore.subscribe((state, event) => {
     overlaysByDraw = state.overlays;
     render(); // re-render the bracket WITH the overlay for currentDrawId (URS-88)
     if (scoreboardMount) renderScoreboard(state, scoreboardMount);
+    if (railsMount) {
+      const assignment = assignRails(state.matches, state.overlays, DRAWS);
+      renderRails(assignment, railsMount);
+    }
+    // B.1: detect real in->post transitions from THIS poll's matches and
+    // queue a celebration for each (URS-107). No-ops gracefully if the
+    // celebration mount is missing (URS-114).
+    for (const win of detectWins(state.matches)) celebration.enqueue(win);
+
     liveStatusText = state.ok
       ? state.liveCount > 0
         ? `Live · updated just now`
@@ -328,7 +437,7 @@ liveStore.subscribe((state, event) => {
     setStatus(true);
   } else {
     // tick: no network, no bracket rebuild (URS-95) -- only the "updated Xs
-    // ago" stamp + LIVE pulse refresh.
+    // ago" stamp + LIVE pulse refresh. B.1/B.3 never rebuild on the tick.
     if (scoreboardMount) updateAgoStampAndPulse(state, scoreboardMount);
   }
 });

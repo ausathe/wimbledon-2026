@@ -24,3 +24,18 @@ export const FETCH_TIMEOUT_MS = 8_000;
 /** Backoff cap on consecutive poll failures (URS-102): widen up to this, never
  * retry in a tight loop; resumes POLL_MS on the next success. */
 export const BACKOFF_MAX_MS = 60_000;
+
+/* ============================================================================
+   Addendum B constants (URS-111.2, URS-111.3, URS-126).
+============================================================================ */
+
+/** Win-celebration banner auto-dismiss duration (URS-111.2). */
+export const CELEBRATION_MS = 6_000;
+
+/** Max celebration cards stacked/visible at once before collapsing the
+ * remainder into a single "+N more results" note (URS-111.3). */
+export const CELEBRATION_MAX_VISIBLE = 3;
+
+/** Viewport width at/above which the persistent left/right rails replace the
+ * "Live now" panel (URS-125, URS-126). Mirrored in live.css's media query. */
+export const RAILS_MIN_WIDTH_PX = 1180;

@@ -24,7 +24,9 @@ function flagURL(iso?: string): string {
 /** Cheap signature of a match's visible state, used to decide whether a card
  * needs to be rebuilt on a poll (URS-97: only changed cells/cards update). */
 function cardSignature(m: LiveMatch): string {
-  const setsSig = m.sets.map((s) => `${s.games[0]}-${s.games[1]}${s.tb ? `(${s.tb})` : ""}`).join(",");
+  const setsSig = m.sets
+    .map((s) => `${s.games[0]}-${s.games[1]}${s.tb ? `(${s.tb})` : ""}`)
+    .join(",");
   return `${m.id}|${m.state}|${m.detail}|${m.court ?? ""}|${setsSig}|${m.currentSetIndex}|${m.players
     .map((p) => `${p.displayName}:${p.serving ? 1 : 0}:${p.winner ? 1 : 0}`)
     .join(",")}`;
@@ -43,8 +45,11 @@ function playerNameHTML(p: LiveMatch["players"][number]): string {
 }
 
 /** Render one scorecard as a real <table> (URS-90, URS-103): rows = players,
- * columns = sets, tiebreak as <sup>. Current set gets a highlight column. */
-function renderCard(m: LiveMatch): string {
+ * columns = sets, tiebreak as <sup>. Current set gets a highlight column.
+ * Exported (LIVE-SCORES-BLUEPRINT addendum B §3.3, URS-122) so the rails
+ * (src/live/rails.ts) reuse the SAME renderer for visual + a11y parity --
+ * never a second card component. */
+export function renderCard(m: LiveMatch): string {
   const [p1, p2] = m.players;
   const setCount = m.sets.length;
   const colHeaders = m.sets

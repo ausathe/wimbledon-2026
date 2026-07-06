@@ -128,11 +128,13 @@ function parseCompetition(raw: unknown, drawKind: DrawKind): LiveMatch | null {
   const playerB = parsePlayer(rawB as EspnCompetitor);
   if (!playerA || !playerB) return null;
 
-  const sets = zipLinescores((rawA as EspnCompetitor).linescores, (rawB as EspnCompetitor).linescores);
+  const sets = zipLinescores(
+    (rawA as EspnCompetitor).linescores,
+    (rawB as EspnCompetitor).linescores,
+  );
   const currentSetIndex = state === "in" ? sets.length - 1 : -1;
 
-  const detail =
-    asString(c.status?.type?.detail) ?? asString(c.status?.type?.shortDetail) ?? "";
+  const detail = asString(c.status?.type?.detail) ?? asString(c.status?.type?.shortDetail) ?? "";
   const court = asString(c.venue?.court);
   const dateIso = asString(c.date);
   const id = asString(c.id) ?? `${playerA.displayName}-${playerB.displayName}-${dateIso ?? ""}`;

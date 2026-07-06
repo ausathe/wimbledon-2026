@@ -6,15 +6,22 @@ A static, single-page interactive **circular radial bracket** for The Championsh
 affiliated with the AELTC / Wimbledon / ATP / WTA / ITF.**
 
 ## Specs (source of truth)
+
 - `docs/URS.md` — numbered requirements (`URS-n`). The contract; test-agent verifies against it.
-  Base bracket = URS-1…URS-77; **live-scores feature = URS-78…URS-106 (addendum A)**.
+  Base bracket = URS-1…URS-77; **live-scores feature = URS-78…URS-106 (addendum A)**;
+  **live UX upgrades (win celebration, live-token pulse, active-match rails) = URS-107…URS-130
+  (addendum B)**.
 - `docs/BUILD-BLUEPRINT.md` — base bracket: stack rationale, folder map, data model, build order.
 - `docs/LIVE-SCORES-BLUEPRINT.md` — live-scores feature: ESPN feed adapter, overlay/reconcile
   design, scoreboard UI, poll/tick timing, degradation matrix, module list (`src/live/**`).
-Reference everything by `URS-n` id. If a requirement looks wrong, escalate to design-agent —
-don't reinterpret it silently.
+  **ADDENDUM B** (same file, at the end) covers the three live UX upgrades: win-detection hook in
+  the poll diff (`celebrate.ts`), the pulse CSS keyed off the token `live` class, and the
+  left/right rails (`rails.ts`, angle-split via `layout.ts`), plus panel↔rails reconciliation.
+  Reference everything by `URS-n` id. If a requirement looks wrong, escalate to design-agent —
+  don't reinterpret it silently.
 
 ## Stack
+
 - **Astro (static output) + TypeScript** — near-zero JS, static bundle for GitHub Pages.
 - Bracket = a **framework-free vanilla-TS island** (SVG polar geometry + HTML token overlay).
 - Styling: scoped CSS + CSS custom-property design tokens (`src/styles/tokens.css`). No Tailwind
@@ -23,6 +30,7 @@ don't reinterpret it silently.
   behind a single adapter so a real feed can be swapped in later.
 
 ## Scripts
+
 - `npm install` — install dependencies (first run).
 - `npm run dev` — local dev server at `http://localhost:4321/wimbledon-2026/` (note the base
   path); click the golden path before calling anything done.
@@ -35,6 +43,7 @@ don't reinterpret it silently.
   the root studio `CLAUDE.md`.
 
 ## Project structure (as built)
+
 - `src/pages/index.astro` — page shell: `<head>` SEO/OG meta, header, bracket stage, courts
   control, visually-hidden results list, footer; mounts `src/bracket/main.ts` as a plain
   `<script>` (Astro auto-bundles/hashes it — no framework runtime).
@@ -53,8 +62,9 @@ don't reinterpret it silently.
   `bracket.css` (stage/tokens/tooltip/capsule/spotlight/status/reduced-motion rules).
 
 ## Deploy
+
 - GitHub Pages via `.github/workflows/deploy.yml`: on push to `main`, runs `npm ci && npm run
-  build` in `projects/wimbledon-2026/`, uploads `dist/` as the Pages artifact, deploys with
+build` in `projects/wimbledon-2026/`, uploads `dist/` as the Pages artifact, deploys with
   `actions/deploy-pages`. Enable once: repo Settings → Pages → Source = "GitHub Actions".
 - `astro.config.mjs` sets `site: 'https://<user>.github.io'` (placeholder `example.github.io` —
   **update this to the real GitHub username/org before deploying**) and
@@ -62,8 +72,10 @@ don't reinterpret it silently.
   Astro's own base handling (verified in the built `dist/index.html`).
 
 ## Swapping in real 2026 data (URS-31)
+
 Once the real 2026 draw/seeds/order-of-play publish, only these files need to change — no
 geometry/render/interaction code touches this:
+
 1. `src/data/players.ts` — replace/extend the `GENTLEMENS_PLAYERS` / `LADIES_PLAYERS` arrays
    (keep each player's `id` stable if a draw JSON already references it, or update both together).
    Each entry needs `id`, `name`, `iso` (flagcdn country code), `shortCode`, optional `seed`.
@@ -75,9 +87,10 @@ geometry/render/interaction code touches this:
    — see URS-11/BUILD-BLUEPRINT §6 for how ring count is derived from skeleton depth, not
    hard-coded).
 3. `src/data/courts.ts` — already the real 6 AELTC show courts; only touch if court list changes.
-No code in `src/bracket/` should need edits for a routine data refresh.
+   No code in `src/bracket/` should need edits for a routine data refresh.
 
 ## Conventions
+
 - TS `strict`; kebab-case files, PascalCase components/types, camelCase symbols.
 - Keep `src/bracket/` pure/data-agnostic — swapping `src/data/` is the only change to load real
   2026 data.
@@ -85,12 +98,14 @@ No code in `src/bracket/` should need edits for a routine data refresh.
   gold on ivory (verify WCAG AA).
 
 ## Definition of done
+
 Every URS MUST passes (SHOULDs pass or signed off), both draws render, golden path works on
 desktop + touch, responsive at mobile/tablet/desktop, a11y + reduced-motion pass, Lighthouse
 ≥90 ×4, no console errors, placeholder data clearly labelled, fan disclaimer present. Test-agent
 issues GREEN — not the developer.
 
 ## Data status
+
 2026 draw/seeds/results/order-of-play are **illustrative placeholders**, clearly labelled in UI
 (URS-40). Stable facts are real: All England Club, grass, 139th Championships, 29 Jun–12 Jul
 2026, 128 singles draw, best-of-5 (Gentlemen's) / best-of-3 (Ladies').

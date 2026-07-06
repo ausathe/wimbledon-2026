@@ -1,0 +1,25 @@
+---
+/* Static shell for the persistent left/right active-match rails (URS-120…
+   URS-128). All dynamic content is filled in by src/live/rails.ts at runtime
+   -- this file carries no business logic (project convention). Both <aside>s
+   start empty/hidden (inline `display:none` set here matches the JS default
+   of "zero live matches") so there's no flash of an empty rail before the
+   first poll resolves (URS-124). CSS breakpoint (live.css, URS-125/URS-126)
+   hides these entirely below RAILS_MIN_WIDTH_PX and shows the existing
+   "Live now" panel instead -- one live UI per breakpoint, never both. */
+---
+
+<aside
+  id="rail-left"
+  class="rail rail-left"
+  aria-label="Live matches, left of draw"
+  style="display:none"
+>
+</aside>
+<aside
+  id="rail-right"
+  class="rail rail-right"
+  aria-label="Live matches, right of draw"
+  style="display:none"
+>
+</aside>
